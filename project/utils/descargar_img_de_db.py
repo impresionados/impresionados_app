@@ -1,8 +1,10 @@
 from project.models.mapeo_colecciones import *
+from project.database.conection import conection
 import os
 
+conection = conection()
 # Asegúrate de que la carpeta donde guardarás las imágenes existe
-os.makedirs("imagenes", exist_ok=True)
+os.makedirs("../imagens", exist_ok=True)
 
 
 # Función para extraer y guardar la imagen
