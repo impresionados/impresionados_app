@@ -5,7 +5,6 @@ import random
 from mapeo_colecciones import Product
 
 # Conexión a la base de datos MongoDB en localhost
-mongoengine.connect("impresionados_app" , host="mongodb+srv://impresionados:656UJjLTTcrEQNuQ@prueba.2hwb4.mongodb.net/?retryWrites=true&w=majority&appName=prueba")
 
 
 # Función para insertar usuarios de prueba

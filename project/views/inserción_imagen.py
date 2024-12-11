@@ -1,9 +1,8 @@
-
 from mapeo_colecciones import *
+import mongoengine
 
 
 # Conexión a la base de datos
-mongoengine.connect("impresionados_app" , host="mongodb+srv://impresionados:656UJjLTTcrEQNuQ@prueba.2hwb4.mongodb.net/?retryWrites=true&w=majority&appName=prueba")
 
 # Insertar el producto
 def insertar_producto():

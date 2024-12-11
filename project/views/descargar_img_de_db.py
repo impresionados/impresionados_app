@@ -2,7 +2,6 @@ from mapeo_colecciones import *
 import os
 import mongoengine
 
-mongoengine.connect("impresionados_app" , host="mongodb+srv://impresionados:656UJjLTTcrEQNuQ@prueba.2hwb4.mongodb.net/?retryWrites=true&w=majority&appName=prueba")
 # Asegúrate de que la carpeta donde guardarás las imágenes existe
 os.makedirs("imagenes", exist_ok=True)
 
