@@ -1,4 +1,4 @@
-from mapeo_colecciones import *
+from project.models.mapeo_colecciones import *
 import base64
 
 # Este archivo recupera una imágen de un producto según su id sin necesidad de gaurdala localmente
@@ -19,7 +19,7 @@ def obtener_imagen_base64(id) -> base64 or None:
 
 ######################################################################################################
 ######################################################################################################
-# Para que la imágen se vea en el fet deben de existir las siguientes líneas
+# Para que la imágen se vea en el flet deben de existir las siguientes líneas
 #   image_base64 = obtener_imagen_base64(product_id)
 #   if image_base64:
 #       image_data_url = f"data:image/jpeg;base64,{image_base64}"

@@ -2,7 +2,6 @@ import mongoengine
 from datetime import datetime
 import random
 
-from mapeo_colecciones import Product
 
 # Conexión a la base de datos MongoDB en localhost
 

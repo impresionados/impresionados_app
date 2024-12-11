@@ -1,5 +1,4 @@
-from mapeo_colecciones import *
-import mongoengine
+from project.models.mapeo_colecciones import *
 
 
 # Conexión a la base de datos
