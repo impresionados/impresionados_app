@@ -1,0 +1,22 @@
+from mapeo_colecciones import *
+import os
+import mongoengine
+
+mongoengine.connect("impresionados_app" , host="mongodb+srv://impresionados:656UJjLTTcrEQNuQ@prueba.2hwb4.mongodb.net/?retryWrites=true&w=majority&appName=prueba")
+# Asegúrate de que la carpeta donde guardarás las imágenes existe
+os.makedirs("imagenes", exist_ok=True)
+
+
+# Función para extraer y guardar la imagen
+def descargar_imagen():
+    for producto in Product.objects():
+        if producto and producto.image:
+            # Lee la imagen desde la base de datos
+            with open(f"imagenes/producto_{producto._id}.jpg", "wb") as archivo_imagen:
+                archivo_imagen.write(producto.image.read())
+            print(f"Imagen descargada correctamente en 'imagenes/producto_{producto._id}.jpg'")
+        else:
+            print("No se encontró la imagen o el producto.")
+
+
+descargar_imagen()
