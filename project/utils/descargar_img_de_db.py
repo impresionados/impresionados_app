@@ -13,9 +13,9 @@ def descargar_imagen():
     for producto in Product.objects():
         if producto and producto.image:
             # Lee la imagen desde la base de datos
-            with open(f"imagenes/producto_{producto._id}.jpg", "wb") as archivo_imagen:
+            with open(f"../imagens/producto_{producto._id}.jpg", "wb") as archivo_imagen:
                 archivo_imagen.write(producto.image.read())
-            print(f"Imagen descargada correctamente en 'imagenes/producto_{producto._id}.jpg'")
+            print(f"Imagen descargada correctamente en './imagens/producto_{producto._id}.jpg'")
         else:
             print("No se encontró la imagen o el producto.")
 
