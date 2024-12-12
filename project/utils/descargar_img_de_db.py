@@ -18,5 +18,5 @@ def descargar_imagen():
         else:
             print("No se encontró la imagen o el producto.")
 
-
-descargar_imagen()
+if __name__ == "__main__":
+    descargar_imagen()
