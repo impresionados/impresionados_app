@@ -10,7 +10,14 @@ class User(mongoengine.Document):
     password = mongoengine.StringField(required=True)
     registration_date = mongoengine.DateTimeField(required=True)
 
-
+    def __str__(self):
+        return (
+            f"ID: {self._id}\n"
+            f"Nombre de usuario: {self.user_name}\n"
+            f"Email: {self.email}\n"
+            f"Contraseña: {self.password}\n"
+            f"Fecha de registro: {self.registration_date.strftime('%Y-%m-%d %H:%M:%S')}\n"
+        )
 class Rating(mongoengine.EmbeddedDocument):  # To specify that it is inside another class
     user_id = mongoengine.StringField(required=True)
     rating = mongoengine.IntField(required=True)

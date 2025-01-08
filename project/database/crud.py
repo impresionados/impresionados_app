@@ -1,4 +1,5 @@
 from project.models.mapeo_colecciones import *
+from project.database.conection import conection
 '''Este archivo solo contiene las funciones de select y delete de algún registro según su id'''
 
 def select_usuario(id:int) -> object|None:

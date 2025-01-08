@@ -4,7 +4,6 @@ import os
 
 # Cargar las variables del archivo .env
 load_dotenv()
-
 def conection():
     """
     Establece una conexión con la base de datos MongoDB usando mongoengine.
@@ -24,3 +23,4 @@ def conection():
     except Exception as e:
         print("Error al conectar con la base de datos:", str(e))
         return None
+conection()
