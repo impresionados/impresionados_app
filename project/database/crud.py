@@ -72,3 +72,38 @@ def delete_pedido(id: int) -> bool:
         print(f"No se encontró el pedido con ID {id}.")
         to_return = False
     return to_return
+from project.database.conection import conection
+from mongoengine import get_db
+
+def registrar_usuario(data: dict) -> bool:
+    """
+    Función para registrar un usuario en la base de datos.
+    Args:
+        data (dict): Diccionario con los datos del usuario. Ejemplo:
+                     {"usuario": "nombre", "email": "correo@example.com", "password": "contraseña123"}
+    Returns:
+        bool: True si el usuario se registra con éxito, False en caso contrario.
+    """
+    try:
+        # Obtener la conexión a la colección 'users'
+        users_collection = get_db()['users']
+
+        # Verificar si el correo ya existe en la base de datos
+        if users_collection.find_one({"email": data["email"]}):
+            print("El correo ya está registrado.")
+            return False
+        else:
+        # Insertar el nuevo usuario
+            users_collection.insert_one({
+                "usuario": data["usuario"],
+                "email": data["email"],
+                "password": data["password"]  
+            })
+            print("Usuario registrado correctamente.")
+            return True
+    except Exception as e:
+        print(f"Error al registrar usuario: {e}")
+        return False
+
+
+
