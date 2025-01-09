@@ -3,3 +3,4 @@
 *.iml
 imagens/
 *.pyc
+__pycache__/
