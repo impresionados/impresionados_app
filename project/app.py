@@ -21,7 +21,7 @@ def main(page: ft.Page):
         elif route.route == "/cesta":
             page.add(cesta_view(page, shopping_cart))
         elif route.route == "/login":
-            page.add(login_view())
+            page.add(login_view(page))
         elif route.route == "/compra":
             page.add(compra_view(page, shopping_cart))
 
@@ -30,4 +30,5 @@ def main(page: ft.Page):
     page.on_route_change = on_route_change
     page.go("/")
 
-ft.app(target=main, view=ft.WEB_BROWSER)
+# ft.app(target=main, view=ft.WEB_BROWSER)
+ft.app(target=main)
