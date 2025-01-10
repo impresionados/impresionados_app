@@ -14,14 +14,14 @@ def obtener_productos() -> QuerySet:
         productos = Product.objects()  # Recupera todos los productos de la base de datos
 
         # Crear carpeta 'imagenes' si no existe
-        carpeta_imagenes = '../imagens'
+        carpeta_imagenes = 'imagens'
         if not os.path.exists(carpeta_imagenes):
             os.makedirs(carpeta_imagenes)
 
         # Guardar imágenes localmente con el nombre basado en el _id
         for producto in productos:
             if producto.image:  # Verifica si el producto tiene una imagen
-                with open(f"{carpeta_imagenes}/{producto._id}.jpg", "wb") as img_file:
+                with open(f"{carpeta_imagenes}/{producto.id}.jpg", "wb") as img_file:
                     img_file.write(producto.image.read())  # Guarda la imagen con el nombre del ID
 
         return productos
@@ -44,7 +44,7 @@ def obtener_producto_por_id(productos, producto_id):
     """
     try:
         for producto in productos:
-            if producto._id == producto_id:
+            if producto.id == producto_id:
                 return producto
         print(f"Producto con ID {producto_id} no encontrado.")
         return None
@@ -61,7 +61,7 @@ def obtener_imagen_producto_id(producto_id):
         producto_id (int): El ID del producto cuya imagen se quiere abrir.
     """
     try:
-        ruta_imagen = f"../imagens/{producto_id}.jpg"
+        ruta_imagen = f"imagens/{producto_id}.jpg"
         if os.path.exists(ruta_imagen):
             return ruta_imagen
         else:

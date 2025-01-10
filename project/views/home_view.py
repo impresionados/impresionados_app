@@ -1,10 +1,10 @@
 import flet as ft
-from project.utils.obtener_productos import obtener_productos, obtener_imagen_producto_id
+from project.database.crud_entero import get_product, obtener_imagen_producto_id
 
 # Obtener los productos desde la base de datos
-items = obtener_productos()
+items = get_product()
 shopping_cart = []  # Lista para almacenar los productos añadidos
-
+print(items)
 # Función TEMPORAL para la vista principal
 def home_view(page, shopping_cart):
     """
@@ -25,7 +25,7 @@ def home_view(page, shopping_cart):
         ft.Card(
             content=ft.Column(
                 controls=[
-                    ft.Image(src=obtener_imagen_producto_id(product._id), width=150, height=150),
+                    ft.Image(src=obtener_imagen_producto_id(product.id), width=150, height=150),
                     ft.Text(f"{product.name}\n{product.description}\n{product.price}€"),
                     ft.ElevatedButton("Añadir a la cesta", on_click=add_to_cart, data=product)
                 ],
