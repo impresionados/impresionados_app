@@ -5,7 +5,7 @@ from datetime import datetime
 class User(mongoengine.Document):
     meta = {'collection': 'users'}  # To specify the collection being mapped
 
-    _id = mongoengine.IntField(required=True)
+    # _id = mongoengine.IntField(required=True)
     user_name = mongoengine.StringField(required=True)
     email = mongoengine.StringField(required=True)
     password = mongoengine.StringField(required=True)
@@ -21,7 +21,7 @@ class Rating(mongoengine.EmbeddedDocument):  # To specify that it is inside anot
 class Product(mongoengine.Document):
     meta = {'collection': 'products'}
 
-    _id = mongoengine.IntField(required=True)
+    # _id = mongoengine.IntField(required=True)
     name = mongoengine.StringField(required=True)
     description = mongoengine.StringField()
     price = mongoengine.FloatField(required=True)
@@ -34,7 +34,7 @@ class Product(mongoengine.Document):
 class Order(mongoengine.Document):
     meta = {'collection': 'orders'}
 
-    _id = mongoengine.IntField(required=True)
+    # _id = mongoengine.IntField(required=True)
     product_id = mongoengine.StringField(required=True)
     user_id = mongoengine.StringField(required=True)
     date = mongoengine.DateTimeField(required=True)
