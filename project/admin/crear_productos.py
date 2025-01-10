@@ -1,0 +1,78 @@
+import flet as ft
+import project.database.conection
+from project.models.mapeo_colecciones import *
+
+
+# Función para agregar un producto
+def add_product(page, name, description, price, stock, category, image, ratings):
+    new_product = Product(
+        name=name,
+        description=description,
+        price=price,
+        stock=stock,
+        category=category.split(","),
+        image=image,
+        ratings=ratings
+    )
+    new_product.save()
+    page.add(ft.Text(f"Product '{name}' added successfully."))
+
+
+# Función para manejar la subida de imágenes
+def upload_image(file_picker_result):
+    if file_picker_result.files:
+        image_file = file_picker_result.files[0]  # Tomar el primer archivo
+        # Guardar la imagen en MongoDB como un archivo binario
+        return image_file.read()  # Leemos el archivo como binario
+    return None
+
+
+# Crear la interfaz de Flet
+def main(page):
+    page.title = "Product Management"
+    page.vertical_alignment = ft.MainAxisAlignment.START
+
+    # Entradas de texto
+    name_input = ft.TextField(label="Product Name")
+    description_input = ft.TextField(label="Description", multiline=True)
+    price_input = ft.TextField(label="Price", keyboard_type=ft.KeyboardType.NUMBER)
+    stock_input = ft.TextField(label="Stock", keyboard_type=ft.KeyboardType.NUMBER)
+    category_input = ft.TextField(label="Category (comma-separated)")
+    ratings_input = ft.TextField(label="Ratings (comma-separated, score:comment)", multiline=True)
+
+    # Variable para almacenar la imagen seleccionada
+    image_data = None
+
+    # Crear el selector de archivos para la imagen
+    def on_image_select(file_picker_result):
+        nonlocal image_data
+        image_data = upload_image(file_picker_result)
+
+    image_input = ft.FilePicker(on_result=on_image_select)
+
+    # Función para enviar el producto
+    def submit_product(e):
+        # Procesar calificaciones
+        ratings = []
+        for rating_str in ratings_input.value.split(","):
+            try:
+                score, comment = rating_str.split(":")
+                ratings.append(Rating(score=int(score), comment=comment))
+            except ValueError:
+                pass  # Handle any malformed rating input gracefully
+
+        # Subir el producto con la imagen
+        add_product(page, name_input.value, description_input.value, float(price_input.value),
+                    int(stock_input.value), category_input.value, image_data, ratings)
+
+    submit_button = ft.ElevatedButton("Add Product", on_click=submit_product)
+
+    # Layout
+    page.add(
+        name_input, description_input, price_input, stock_input,
+        category_input, ratings_input, image_input, submit_button
+    )
+
+
+# Ejecutar la app
+ft.app(target=main)

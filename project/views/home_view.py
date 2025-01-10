@@ -4,7 +4,7 @@ from project.utils.obtener_productos import obtener_productos, obtener_imagen_pr
 # Obtener los productos desde la base de datos
 items = obtener_productos()
 shopping_cart = []  # Lista para almacenar los productos añadidos
-
+print(items)
 # Función TEMPORAL para la vista principal
 def home_view(page, shopping_cart):
     """
