@@ -25,7 +25,7 @@ def home_view(page, shopping_cart):
         ft.Card(
             content=ft.Column(
                 controls=[
-                    ft.Image(src=obtener_imagen_producto_id(product._id), width=150, height=150),
+                    ft.Image(src=obtener_imagen_producto_id(product.id), width=150, height=150),
                     ft.Text(f"{product.name}\n{product.description}\n{product.price}€"),
                     ft.ElevatedButton("Añadir a la cesta", on_click=add_to_cart, data=product)
                 ],
