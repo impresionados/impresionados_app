@@ -116,6 +116,79 @@ def login_view(page):
         page.dialog.open = True
         page.update()
 
+    # Función para abrir la ventana de cambio de contraseña
+    def open_password_reset_view(e):
+        # Campos para el cambio de contraseña
+        reset_email = ft.TextField(label="Correo Electrónico", prefix_icon=ft.icons.EMAIL)
+        new_password = ft.TextField(label="Nueva Contraseña", password=True, prefix_icon=ft.icons.LOCK)
+        confirm_new_password = ft.TextField(label="Confirmar Nueva Contraseña", password=True, prefix_icon=ft.icons.LOCK)
+        reset_message = ft.Text("", size=14, color=ft.colors.RED)
+
+        # Función para manejar el cambio de contraseña
+        def reset_password_click(e):
+            email = reset_email.value
+            password = new_password.value
+            confirm = confirm_new_password.value
+
+            if not email or not password or not confirm:
+                reset_message.value = "Por favor, complete todos los campos."
+                reset_message.color = ft.colors.RED
+            elif "@" not in email:
+                reset_message.value = "El correo electrónico no es válido."
+                reset_message.color = ft.colors.RED
+            elif password != confirm:
+                reset_message.value = "Las contraseñas no coinciden."
+                reset_message.color = ft.colors.RED
+            else:
+                # Llamar a la función para cambiar la contraseña (simulada)
+                # Puedes implementar esta lógica en tu backend
+                reset_message.value = "Contraseña cambiada exitosamente."
+                reset_message.color = ft.colors.GREEN
+                close_password_reset_view()  # Cerrar el modal tras el cambio exitoso
+                # Mostrar SnackBar de éxito
+                page.snack_bar = ft.SnackBar(ft.Text("Contraseña cambiada exitosamente", size=16, color=ft.colors.WHITE), bgcolor=ft.colors.GREEN)
+                page.snack_bar.open = True
+
+            reset_message.update()
+
+        # Función para cerrar el modal de cambio de contraseña
+        def close_password_reset_view():
+            page.dialog.open = False  # Cerrar el modal
+            page.update()  # Actualizar la página para reflejar los cambios
+
+        # Crear y mostrar la ventana modal
+        page.dialog = ft.AlertDialog(
+            modal=True,
+            title=ft.Text("Cambiar Contraseña"),
+            content=ft.Container(
+                width=350,
+                padding=20,
+                content=ft.Column(
+                    controls=[
+                        reset_email,
+                        new_password,
+                        confirm_new_password,
+                        reset_message,
+                        ft.ElevatedButton(
+                            text="Cambiar Contraseña",
+                            width=200,
+                            on_click=reset_password_click,  # Llamar a la función de cambio de contraseña
+                        ),
+                    ],
+                    alignment=ft.MainAxisAlignment.CENTER,
+                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                ),
+            ),
+            actions=[
+                ft.TextButton(
+                    text="Cerrar",
+                    on_click=lambda e: close_password_reset_view(),  # Llamar a la función para cerrar el modal
+                ),
+            ],
+        )
+        page.dialog.open = True
+        page.update()
+
     # Contenedor para toda la vista
     return ft.Container(
         expand=True,
@@ -147,7 +220,7 @@ def login_view(page):
                     message_text,
                     ft.TextButton(
                         text="¿Olvidaste tu contraseña?",
-                        on_click=lambda e: print("Recuperar contraseña"),
+                        on_click=open_password_reset_view,  # Abre la ventana de cambio de contraseña
                     ),
                     ft.TextButton(
                         text="¿No tienes cuenta? Regístrate",
