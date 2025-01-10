@@ -1,6 +1,7 @@
 import flet as ft
 import project.database.conection
-from project.models.mapeo_colecciones import *
+from project.models.mapeo_colecciones import Product
+import os, shutil
 
 
 # Función para agregar un producto
@@ -23,7 +24,7 @@ def upload_image(file_picker_result):
     if file_picker_result.files:
         image_file = file_picker_result.files[0]  # Tomar el primer archivo
         # Guardar la imagen en MongoDB como un archivo binario
-        return image_file.read()  # Leemos el archivo como binario
+        return image_file  # Leemos el archivo como binario
     return None
 
 
@@ -43,12 +44,21 @@ def main(page):
     # Variable para almacenar la imagen seleccionada
     image_data = None
 
-    # Crear el selector de archivos para la imagen
-    def on_image_select(file_picker_result):
-        nonlocal image_data
-        image_data = upload_image(file_picker_result)
+    def on_file_select(e):
+        if e.files:
+            selected_file = e.files[0]
+            print(f"Archivo seleccionado: {selected_file.name}")
+            # Asignar la imagen seleccionada
+            global image_data
+            image_data = upload_image(e)  # Guardar la imagen
 
-    image_input = ft.FilePicker(on_result=on_image_select)
+    # Crear el componente para seleccionar archivos
+    image_input = ft.FilePicker(on_result=on_file_select)
+
+    def on_save_button_click(e):
+        image_input.pick_files()  # Abrir el FilePicker para seleccionar el archivo
+
+    save_button = ft.ElevatedButton("Guardar archivo", on_click=on_save_button_click)
 
     # Función para enviar el producto
     def submit_product(e):
@@ -61,6 +71,10 @@ def main(page):
             except ValueError:
                 pass  # Handle any malformed rating input gracefully
 
+        if not image_input:
+            page.add(ft.Text("Please select an image before submitting the product."))
+            return
+
         # Subir el producto con la imagen
         add_product(page, name_input.value, description_input.value, float(price_input.value),
                     int(stock_input.value), category_input.value, image_data, ratings)
@@ -70,7 +84,7 @@ def main(page):
     # Layout
     page.add(
         name_input, description_input, price_input, stock_input,
-        category_input, ratings_input, image_input, submit_button
+        category_input, ratings_input, save_button, image_input, submit_button
     )
 
 
