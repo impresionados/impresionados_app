@@ -74,7 +74,8 @@ def delete_user(user_email: str) -> bool:
 # -----------------------------
 # CRUD FUNCTIONS FOR PRODUCTS
 # -----------------------------
-def create_product(name: str, description: str, price: float, stock: int, category: list, img:str) -> Product:
+def create_product(name: str, description: str, price: float,
+                   stock: int, category: list, img:str) -> Product:
     """
     Crea un nuevo producto y lo guarda en la base de datos.
 

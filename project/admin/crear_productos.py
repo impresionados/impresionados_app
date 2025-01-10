@@ -2,22 +2,14 @@ import flet as ft
 import project.database.conection
 from project.models.mapeo_colecciones import Product
 import os, shutil
-
-
+from project.database.crud_entero import create_product
 # Función para agregar un producto
-def add_product(page, name, description, price, stock, category, image, ratings):
-    new_product = Product(
-        name=name,
-        description=description,
-        price=price,
-        stock=stock,
-        category=category.split(","),
-        image=image,
-        ratings=ratings
-    )
-    new_product.save()
-    page.add(ft.Text(f"Product '{name}' added successfully."))
-
+def add_product(page, name, description, price, stock, category, image):
+    try:
+        create_product(name, description, price, stock, list(category), image.path)
+        page.add(ft.Text(f"Producto '{name}' creado"))
+    except:
+        page.add(ft.Text(f"no se ha creado el producto"))
 
 # Función para manejar la subida de imágenes
 def upload_image(file_picker_result):
@@ -41,9 +33,6 @@ def main(page):
     category_input = ft.TextField(label="Category (comma-separated)")
     ratings_input = ft.TextField(label="Ratings (comma-separated, score:comment)", multiline=True)
 
-    # Variable para almacenar la imagen seleccionada
-    image_data = None
-
     def on_file_select(e):
         if e.files:
             selected_file = e.files[0]
@@ -62,14 +51,14 @@ def main(page):
 
     # Función para enviar el producto
     def submit_product(e):
-        # Procesar calificaciones
-        ratings = []
-        for rating_str in ratings_input.value.split(","):
-            try:
-                score, comment = rating_str.split(":")
-                ratings.append(Rating(score=int(score), comment=comment))
-            except ValueError:
-                pass  # Handle any malformed rating input gracefully
+        # # Procesar calificaciones
+        # ratings = []
+        # for rating_str in ratings_input.value.split(","):
+        #     try:
+        #         score, comment = rating_str.split(":")
+        #         ratings.append(Rating(score=int(score), comment=comment))
+        #     except ValueError:
+        #         pass  # Handle any malformed rating input gracefully
 
         if not image_input:
             page.add(ft.Text("Please select an image before submitting the product."))
@@ -77,16 +66,17 @@ def main(page):
 
         # Subir el producto con la imagen
         add_product(page, name_input.value, description_input.value, float(price_input.value),
-                    int(stock_input.value), category_input.value, image_data, ratings)
+                    int(stock_input.value), category_input.value, image_data)
 
     submit_button = ft.ElevatedButton("Add Product", on_click=submit_product)
 
     # Layout
     page.add(
         name_input, description_input, price_input, stock_input,
-        category_input, ratings_input, save_button, image_input, submit_button
+        category_input, save_button, image_input, submit_button
     )
 
-
-# Ejecutar la app
-ft.app(target=main)
+if __name__ == "__main__":
+    image_data = None
+    # Ejecutar la app
+    ft.app(target=main)
