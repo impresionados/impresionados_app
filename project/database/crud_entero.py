@@ -1,6 +1,8 @@
 import mongoengine
 from datetime import datetime
+from project.database.conection import conection
 from project.models.mapeo_colecciones import *
+import os
 
 # -----------------------------
 # CRUD FUNCTIONS FOR USERS
@@ -72,7 +74,7 @@ def delete_user(user_email: str) -> bool:
 # -----------------------------
 # CRUD FUNCTIONS FOR PRODUCTS
 # -----------------------------
-def create_product(_id: int, name: str, description: str, price: float, stock: int, category: list, img:str) -> Product:
+def create_product(name: str, description: str, price: float, stock: int, category: list, img:str) -> Product:
     """
     Crea un nuevo producto y lo guarda en la base de datos.
 
@@ -86,7 +88,6 @@ def create_product(_id: int, name: str, description: str, price: float, stock: i
     """
     with open(img, 'rb') as image_file:
         product = Product(
-            #_id=_id,
             name=name,
             description=description,
             price=price,
@@ -99,20 +100,40 @@ def create_product(_id: int, name: str, description: str, price: float, stock: i
     return product
 
 
-def get_product_by_id(product_id: int) -> Product:
+def get_product(product_id: str = "") -> Product | mongoengine.QuerySet:
     """
-    Obtiene un producto por su ID.
+    Obtiene un producto por su ID o todos los productos de la base de datos.
 
     :param product_id: ID del producto
     :return: El objeto Product encontrado o None si no existe
     """
-    return Product.objects(id=product_id).first()
+    carpeta_imagenes = '../imagens'
+    if product_id == "":
+        productos = Product.objects()  # Recupera todos los productos de la base de datos
 
+        # Crear carpeta 'imagenes' si no existe
+
+        if not os.path.exists(carpeta_imagenes):
+            os.makedirs(carpeta_imagenes)
+
+        # Guardar imágenes localmente con el nombre basado en el _id
+        for producto in productos:
+            if producto.image:  # Verifica si el producto tiene una imagen
+                with open(f"{carpeta_imagenes}/{producto.id}.jpg", "wb") as img_file:
+                    img_file.write(producto.image.read())  # Guarda la imagen con el nombre del ID
+
+        return productos
+    else:
+        producto = Product.objects(id=product_id).first()
+        if producto.image:  # Verifica si el producto tiene una imagen
+            with open(f"{carpeta_imagenes}/{producto.id}.jpg", "wb") as img_file:
+                img_file.write(producto.image.read())  # Guarda la imagen con el nombre del ID
+        return producto
 def get_id_by_product(product):
     return product.id if product else None
 
 
-def update_product(product_id: int, **kwargs) -> Product:
+def update_product(product_id: str, **kwargs) -> Product:
     """
     Actualiza los campos de un producto existente.
 
@@ -127,7 +148,7 @@ def update_product(product_id: int, **kwargs) -> Product:
     return None
 
 
-def delete_product(product_id: int) -> bool:
+def delete_product(product_id: str) -> bool:
     """
     Elimina un producto por su ID.
 
@@ -280,7 +301,6 @@ def delete_order(order_id: int) -> bool:
 # -----------------------------
 # ADD COMMENT TO PRODUCT
 # -----------------------------
-
 def add_comment_to_product(product_id: int, user_id: str, rating: int, comment: str) -> bool:
     """
     Añade un comentario (rating) a un producto existente.
@@ -291,7 +311,7 @@ def add_comment_to_product(product_id: int, user_id: str, rating: int, comment: 
     :param comment: Comentario del usuario
     :return: True si el comentario se añadió correctamente, False si el producto no existe
     """
-    product = get_product_by_id(product_id)
+    product = get_product(product_id)
     if product:
         new_rating = create_rating(user_id, rating, comment)
         product.ratings.append(new_rating)
@@ -301,4 +321,22 @@ def add_comment_to_product(product_id: int, user_id: str, rating: int, comment: 
     return False
 
 
+# -----------------------------
+# GIVE IMAGE PRODUCT PATH
+# -----------------------------
 
+def obtener_imagen_producto_id(producto_id):
+    """
+    Abre la imagen de un producto basado en su _id.
+
+    Args:
+        producto_id (int): El ID del producto cuya imagen se quiere abrir.
+    """
+    try:
+        ruta_imagen = f"../imagens/{producto_id}.jpg"
+        if os.path.exists(ruta_imagen):
+            return ruta_imagen
+        else:
+            print(f"No se encontró la imagen para el producto con ID {producto_id}.")
+    except Exception as e:
+        print(f"Error al abrir la imagen: {e}")
