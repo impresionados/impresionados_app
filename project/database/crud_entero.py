@@ -156,19 +156,20 @@ def get_id_by_product(product):
     return product.id if product else None
 
 
-def update_product(product_id: str, **kwargs) -> Product:
+def update_product(product: Product, image_path: str = None) -> Product:
     """
-    Actualiza los campos de un producto existente.
+    Actualiza los campos de un producto existente y, si se proporciona una imagen, la sube a la base de datos.
 
-    :param product_id: ID del producto a actualizar
-    :param kwargs: Campos a actualizar
+    :param product: Objeto Product a actualizar
+    :param image_path: Ruta del archivo de imagen a actualizar
     :return: El objeto Product actualizado o None si no existe
     """
-    product = Product.objects(_id=product_id).first()
-    if product:
-        product.update(**kwargs)
-        return Product.objects(_id=product_id).first()
-    return None
+    if image_path:
+        with open(image_path, "rb") as img_rb:
+            product.image.replace(img_rb)  # Reemplaza la imagen en la base de datos
+    product.save()  # Guarda los cambios en la base de datos
+    return product
+
 
 
 def delete_product(product_id: str) -> bool:
@@ -356,7 +357,7 @@ def obtener_imagen_producto_id(producto_id):
         producto_id (int): El ID del producto cuya imagen se quiere abrir.
     """
     try:
-        ruta_imagen = f"../imagens/{producto_id}.jpg"
+        ruta_imagen = f"../images/{producto_id}.jpg"
         if os.path.exists(ruta_imagen):
             return ruta_imagen
         else:

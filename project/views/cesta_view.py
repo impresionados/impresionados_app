@@ -37,6 +37,7 @@ def cesta_view(page, shopping_cart):
                                     "Ver detalles",
                                     on_click=lambda e, product=item: open_product_details(page, product),
                                 ),
+                                ft.Text(f"Precio total: {float(item[0].price) * item[1]}€", color=ft.colors.RED_600),
                             ],
                             spacing=5,
                             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
@@ -45,6 +46,7 @@ def cesta_view(page, shopping_cart):
                         width=200,
                         height=250,
                         alignment=ft.alignment.center,
+
                     ),
                     elevation=3,
                     margin=5,
@@ -87,7 +89,17 @@ def cesta_view(page, shopping_cart):
         else:
             # Mensaje de cesta vacía
             page.add(
-                ft.Text("Tu cesta está vacía 🫙", style="bodyLarge", color=ft.colors.RED_400)
+                ft.Container(
+                    content=ft.Text(
+                        "🫙 Tu cesta está vacía 🫙",
+                        style="headlineLarge",
+                        weight="bold",
+                        color=ft.colors.RED_500,
+                        text_align=ft.TextAlign.CENTER,
+                    ),
+                    alignment=ft.alignment.center,
+                    expand=True,
+                )
             )
 
         # Botón para vaciar la cesta
