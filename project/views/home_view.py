@@ -16,7 +16,12 @@ def home_view(page, shopping_cart):
     # Agregar productos a la cesta
     def add_to_cart(e):
         product = e.control.data
-        shopping_cart.append(product)
+        for product_in_cart in shopping_cart:
+            if product_in_cart[0] == product:
+                product_in_cart[1] += 1
+                break
+        else:
+            shopping_cart.append([product,1])
         page.snack_bar = ft.SnackBar(ft.Text(f"{product.name} añadido a la cesta"))
         page.snack_bar.open = True
         page.update()
