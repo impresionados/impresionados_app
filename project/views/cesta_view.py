@@ -73,15 +73,6 @@ def cesta_view(page, shopping_cart):
                     on_click=lambda e: page.go("/compra"),
                 )
             )
-            page.add(
-                ft.ElevatedButton(
-                    "Vaciar cesta",
-                    icon=ft.icons.DELETE,
-                    color=ft.colors.WHITE,
-                    bgcolor=ft.colors.RED_600,
-                    on_click=clear_cart,
-                )
-            )
         else:
             # Mensaje de cesta vacía
             page.add(
@@ -89,7 +80,15 @@ def cesta_view(page, shopping_cart):
             )
 
         # Botón para vaciar la cesta
-
+        page.add(
+            ft.ElevatedButton(
+                "Vaciar cesta",
+                icon=ft.icons.DELETE,
+                color=ft.colors.WHITE,
+                bgcolor=ft.colors.RED_600,
+                on_click=clear_cart,
+            )
+        )
 
         page.update()
 
@@ -108,13 +107,10 @@ def cesta_view(page, shopping_cart):
         """
         quantity = 1  # Cantidad inicial
 
-        # Crear una referencia para la cantidad
-        quantity_display = ft.Ref()
-
         # Actualizar la cantidad mostrada
         def update_quantity_display():
-            quantity_display.current.value = str(quantity)
-            page.update()
+            quantity_display.value = str(quantity)
+            quantity_display.update()  # Actualiza solo el control de cantidad
 
         # Aumentar la cantidad
         def increment_quantity(e):
@@ -135,8 +131,12 @@ def cesta_view(page, shopping_cart):
                 shopping_cart.append(product)
             page.snack_bar = ft.SnackBar(ft.Text(f"{quantity} x {product.name} añadido(s) a la cesta"))
             page.snack_bar.open = True
-            page.update()
-            close_dialog()
+            dialog.open = False
+            dialog.update()
+            update_cart_view()  # Actualiza la vista del carrito
+
+        # Mostrar la cantidad
+        quantity_display = ft.Text(value=str(quantity), size=20, weight="bold")
 
         # Crear el diálogo
         dialog = ft.AlertDialog(
@@ -149,7 +149,7 @@ def cesta_view(page, shopping_cart):
                     ft.Row(
                         controls=[
                             ft.ElevatedButton("-", on_click=decrement_quantity),
-                            ft.Text(ref=quantity_display, value="1", size=20, weight="bold"),
+                            quantity_display,
                             ft.ElevatedButton("+", on_click=increment_quantity),
                         ],
                         alignment=ft.MainAxisAlignment.CENTER,
@@ -162,15 +162,12 @@ def cesta_view(page, shopping_cart):
             ),
         )
 
-        # Mostrar el diálogo
-        page.dialog = dialog
-        page.dialog.open = True
-        page.update()
+        # Mostrar el diálogo usando page.show_dialog()
+        page.show_dialog(dialog)
 
-    # Función para cerrar el diálogo
-    def close_dialog():
-        page.dialog.open = False
-        page.update()
+        def close_dialog():
+            dialog.open = False  # Cierra el diálogo
+            dialog.update()  # Actualiza solo el diálogo
 
     # Inicializar la vista
     update_cart_view()
