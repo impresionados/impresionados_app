@@ -131,9 +131,19 @@ def cesta_view(page, shopping_cart):
         # Aumentar la cantidad
         def increment_quantity(e):
             nonlocal quantity
-            quantity += 1
-            update_quantity_display()
-            add_to_cart_with_quantity(e)
+            if check_stock():
+                quantity += 1
+                update_quantity_display()
+                add_to_cart_with_quantity(e)
+            else:
+                dialog.open = False
+                page.snack_bar = ft.SnackBar(
+                    ft.Text(f"No hay más unidades de {product.name} disponibles en stock."),
+                    bgcolor=ft.colors.RED,
+                )
+                page.snack_bar.open = True
+                page.update()  # Actualiza la página para que el SnackBar se muestre
+
 
         # Disminuir la cantidad
         def decrement_quantity(e):
@@ -148,6 +158,10 @@ def cesta_view(page, shopping_cart):
                 update_quantity_display()
 
             add_to_cart_with_quantity(e)
+
+        def check_stock() -> bool:
+            stock_in_db = product.stock
+            return quantity < stock_in_db
 
         # Añadir a la cesta con la cantidad seleccionada
         def add_to_cart_with_quantity(e):

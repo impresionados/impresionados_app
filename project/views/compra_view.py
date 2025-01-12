@@ -24,7 +24,14 @@ def compra_view(page, shopping_cart):
             shopping_cart.clear()
             page.snack_bar = ft.SnackBar(ft.Text("¡COMPRA REALIZADA! 🎉"))
             page.snack_bar.open = True
+            restar_stock()
             page.go("/")  # Redirige al home después de la compra
+
+    def restar_stock():
+        for products in shopping_cart:
+            product = products[0]
+            quantity = products[1]
+            product.stock -= quantity
 
     page.controls.clear()
     page.add(header(page, shopping_cart))
