@@ -1,4 +1,5 @@
 import flet as ft
+from project.database.crud_entero import get_product, obtener_imagen_producto_id
 
 # Obtener los productos desde la base de datos
 items = get_product()
