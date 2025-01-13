@@ -101,35 +101,57 @@ def create_product(name: str, description: str, price: float,
     return product
 
 
-def get_product(product_id: str = "") -> Product | mongoengine.QuerySet:
+def save_product_image(product, folder_path: str):
+    """
+    Guarda la imagen del producto localmente en una carpeta específica.
+
+    :param product: Objeto Product
+    :param folder_path: Ruta de la carpeta donde se guardará la imagen
+    """
+    try:
+        if product.image:  # Verifica si el producto tiene una imagen
+            image_path = os.path.join(folder_path, f"{product.id}.jpg")
+            with open(image_path, "wb") as img_file:
+                img_file.write(product.image.read())
+    except Exception as e:
+        print(f"Error al guardar la imagen del producto {product.id}: {e}")
+
+
+def get_product(product_id: str = "", category_list: list[str] = [], discard: bool = True) -> Product | mongoengine.QuerySet:
     """
     Obtiene un producto por su ID o todos los productos de la base de datos.
 
     :param product_id: ID del producto
+    :param category_list: Lista de categorías a filtrar
+    :param discard: Si es True, filtra por categorías; si es False, las descarta
     :return: El objeto Product encontrado o None si no existe
     """
-    carpeta_imagenes = '../imagens'
+    carpeta_imagenes = '../images'
+
+    # Crear carpeta 'imagenes' si no existe
+    if not os.path.exists(carpeta_imagenes):
+        os.makedirs(carpeta_imagenes)
+
     if product_id == "":
         productos = Product.objects()  # Recupera todos los productos de la base de datos
 
-        # Crear carpeta 'imagenes' si no existe
-
-        if not os.path.exists(carpeta_imagenes):
-            os.makedirs(carpeta_imagenes)
-
-        # Guardar imágenes localmente con el nombre basado en el _id
         for producto in productos:
-            if producto.image:  # Verifica si el producto tiene una imagen
-                with open(f"{carpeta_imagenes}/{producto.id}.jpg", "wb") as img_file:
-                    img_file.write(producto.image.read())  # Guarda la imagen con el nombre del ID
+            if category_list:
+                if discard:
+                    if not set(producto.category) & set(category_list):
+                        continue
+                else:
+                    if set(producto.category) & set(category_list):
+                        continue
 
+            save_product_image(producto, carpeta_imagenes)
         return productos
     else:
         producto = Product.objects(id=product_id).first()
-        if producto.image:  # Verifica si el producto tiene una imagen
-            with open(f"{carpeta_imagenes}/{producto.id}.jpg", "wb") as img_file:
-                img_file.write(producto.image.read())  # Guarda la imagen con el nombre del ID
+        if producto:
+            save_product_image(producto, carpeta_imagenes)
         return producto
+
 def get_id_by_product(product):
     return product.id if product else None
 

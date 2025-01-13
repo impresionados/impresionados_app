@@ -1,6 +1,5 @@
 from project.models.mapeo_colecciones import *
 from project.database.conection import conection
-from datetime import datetime
 '''Este archivo solo contiene las funciones de select y delete de algún registro según su id'''
 
 def select_usuario(id:int) -> object|None:
@@ -99,7 +98,7 @@ def registrar_usuario(data: dict) -> bool:
                 "usuario": data["usuario"],
                 "email": data["email"],
                 "password": data["password"],
-                "registration_date": datetime.now()  
+                "registration_date": f"{datetime.now()}"  
             })
             print("Usuario registrado correctamente.")
             return True
