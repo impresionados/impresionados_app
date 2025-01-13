@@ -1,6 +1,7 @@
 import flet as ft
 import os
 
+
 cart_count_text = ft.Text(f"Cesta (0)", style="bodyLarge")
 def update_cart_count(shopping_cart):
     cart_count_text.value = f"Cesta ({len(shopping_cart)})"

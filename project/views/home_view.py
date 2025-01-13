@@ -5,10 +5,9 @@ from project.views.header import update_cart_count
 # Obtener los productos desde la base de datos
 items = get_product()
 shopping_cart = []  # Lista para almacenar los productos añadidos
-print(items)
-
-# Función TEMPORAL para la vista principal
-def home_view(page, shopping_cart):
+max_text_len = 40
+# Función para la vista principal
+def home_view(page, shopping_cart, update_cart_count):
     """
     Genera la vista principal de productos, mostrando cada uno con su imagen y permitiendo añadirlos al carrito.
     """
@@ -57,44 +56,65 @@ def home_view(page, shopping_cart):
             content=ft.Container(
                 content=ft.Column(
                     controls=[
-                        ft.Image(src=obtener_imagen_producto_id(product.id), width=150, height=150),
+                        ft.Image(src=obtener_imagen_producto_id(product.id), width=180, height=180),
                         ft.Text(
-                            f"{product.name}\n{product.description}\n{product.price}€",
-                            max_lines=2,
+                            f"{product.name[:20]}..." if len(product.name) > 20 else product.name,
+                            style="titleSmall",
+                            color=ft.colors.BLUE_GREY_800
+                        ),
+                        ft.Text(
+                            f"{product.description[:max_text_len]}..." if len(product.description) > max_text_len else product.description,
+                            max_lines=3,
                             overflow=ft.TextOverflow.ELLIPSIS,
-                            style="bodySmall"
+                            style="bodyMedium",
+                            color=ft.colors.GREY_600
+                        ),
+                        ft.Text(
+                            f"{product.price}€",
+                            style="bodyLarge",
+                            color=ft.colors.GREEN_700,
+                            weight=ft.FontWeight.BOLD
                         ),
                         ft.Row(
                             controls=[
                                 ft.ElevatedButton("Añadir a la cesta", on_click=add_to_cart, data=product),
                                 ft.TextButton("Ver más", on_click=open_product_details, data=product)
                             ],
-                            alignment=ft.MainAxisAlignment.CENTER
+                            alignment=ft.MainAxisAlignment.CENTER,
+                            spacing=10
                         )
                     ],
                     horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                    spacing=10
+                    spacing=15
                 ),
-                padding=10,
-                width=250,
-                height=400,
-                alignment=ft.alignment.center
+                padding=15,
+                alignment=ft.alignment.center,
+                border_radius=10,
+                bgcolor=ft.colors.WHITE
             ),
-            elevation=5
-        ) for product in products
+            elevation=10,
+            margin=10
+        )
+        for product in products
     ]
 
     # Uso de GridView para mostrar los productos con scroll
-    return ft.Column(
-        controls=[
-            ft.Text("Catálogo de productos", style="headlineMedium"),
-            ft.GridView(
-                controls=product_cards,
-                runs_count=3,
-                spacing=10,
-                run_spacing=10,
-                max_extent=300,
-                expand=1
-            )
-        ]
+    return ft.Container(
+        content=ft.Column(
+            controls=[
+                ft.Text("Catálogo de productos", style="headlineLarge", color=ft.colors.BLUE_GREY_900),
+                ft.GridView(
+                    controls=product_cards,
+                    runs_count=3,
+                    spacing=20,
+                    run_spacing=20,
+                    max_extent=450,
+                    expand=1
+                )
+            ],
+            alignment=ft.MainAxisAlignment.START,
+            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+            spacing=20  # Añadido espacio extra para evitar que los botones toquen el borde
+        ),
+        padding=20
     )

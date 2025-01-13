@@ -3,16 +3,15 @@ from project.views.header import header
 from project.database.crud_entero import obtener_imagen_producto_id
 
 
-def cesta_view(page, shopping_cart):
+def cesta_view(page, shopping_cart,update_cart_count):
     """
-    Vista de la cesta de compras que muestra los productos agregados,
-    permite ajustar cantidades y ver detalles de cada producto.
-    """
-
+        Vista de la cesta de compras que muestra los productos agregados,
+        permite ajustar cantidades y ver detalles de cada producto.
+        """
     # Actualizar la vista de la cesta
     def update_cart_view():
         page.controls.clear()
-        page.add(header(page, shopping_cart))
+        page.add(header(page, shopping_cart, update_cart_count))
 
         # Título de la cesta
         page.add(ft.Text("🛒 Cesta de Compras", style="headlineMedium", weight="bold"))
