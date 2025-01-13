@@ -5,3 +5,4 @@ imagens/
 *.pyc
 __pycache__/.idea/
 *.xml
+*.idea/*
