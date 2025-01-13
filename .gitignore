@@ -4,4 +4,4 @@
 imagens/
 *.pyc
 __pycache__/.idea/
-*.iml
+*.xml
