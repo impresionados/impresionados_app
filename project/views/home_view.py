@@ -3,25 +3,32 @@ from project.database.crud_entero import get_product, obtener_imagen_producto_id
 
 # Obtener los productos desde la base de datos
 items = get_product()
-shopping_cart = []  # Lista para almacenar los productos añadidos
 max_text_len = 40
-# Función para la vista principal
+
 def home_view(page, shopping_cart, update_cart_count):
     """
     Genera la vista principal de productos, mostrando cada uno con su imagen y permitiendo añadirlos al carrito.
     """
-    products = [i for i in items]  # Lista de productos obtenidos
+    products = [i for i in items]
 
-    # Agregar productos a la cesta
     def add_to_cart(e):
         product = e.control.data
-        shopping_cart.append(product)
-        update_cart_count()  # Actualiza el contador en la cabecera
+
+        if len(shopping_cart) == 0:
+            shopping_cart.append([product, 1])
+        else:
+            for item in shopping_cart:
+                if item[0].id == product.id:
+                    item[1] += 1
+                    break
+            else:
+                shopping_cart.append([product, 1])
+
+        update_cart_count()
         page.snack_bar = ft.SnackBar(ft.Text(f"{product.name} añadido a la cesta"))
         page.snack_bar.open = True
         page.update()
 
-    # Abrir ventana de detalles del producto
     def open_product_details(e):
         product = e.control.data
 
@@ -45,7 +52,6 @@ def home_view(page, shopping_cart, update_cart_count):
         )
         page.update()
 
-    # Crear una lista de tarjetas (grid) para los productos
     product_cards = [
         ft.Card(
             content=ft.Container(
@@ -93,7 +99,6 @@ def home_view(page, shopping_cart, update_cart_count):
         for product in products
     ]
 
-    # Uso de GridView para mostrar los productos con scroll
     return ft.Container(
         content=ft.Column(
             controls=[
@@ -107,9 +112,8 @@ def home_view(page, shopping_cart, update_cart_count):
                     expand=1
                 )
             ],
-            alignment=ft.MainAxisAlignment.START,
-            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-            spacing=20  # Añadido espacio extra para evitar que los botones toquen el borde
+            spacing=20,
+            scroll=ft.ScrollMode.AUTO
         ),
         padding=20
     )

@@ -16,7 +16,10 @@ def main(page: ft.Page):
     cart_count_text = ft.Text(f"Cesta ({len(shopping_cart)})")
 
     def update_cart_count():
-        cart_count_text.value = f"Cesta ({len(shopping_cart)})"
+        aux = 0
+        for item in shopping_cart:
+            aux += item[1]
+        cart_count_text.value = f"Cesta ({aux})"
         cart_count_text.update()
 
     def on_route_change(route):
@@ -26,11 +29,11 @@ def main(page: ft.Page):
         if route.route == "/":
             page.add(home_view(page, shopping_cart, update_cart_count))
         elif route.route == "/cesta":
-            page.add(cesta_view(page, shopping_cart, update_cart_count))
+            page.add(cesta_view(page, shopping_cart, update_cart_count, cart_count_text)) # cart_count_text
         elif route.route == "/login":
             page.add(login_view(page))
         elif route.route == "/compra":
-            page.add(compra_view(page, shopping_cart, cart_count_text))
+            page.add(compra_view(page, shopping_cart)) # cart_count_text
 
         page.update()
 
