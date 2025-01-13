@@ -1,11 +1,11 @@
 import flet as ft
 from project.views.header import header
 
-def cesta_view(page, shopping_cart):
+def cesta_view(page, shopping_cart,update_cart_count):
     # Actualizar la vista de la cesta
     def update_cart_view():
         page.controls.clear()
-        page.add(header(page, shopping_cart))
+        page.add(header(page, shopping_cart, update_cart_count))
 
         page.add(ft.Text("Cesta de Compras", style="headlineMedium"))
 

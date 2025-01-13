@@ -19,11 +19,11 @@ def main(page: ft.Page):
         if route.route == "/":
             page.add(home_view(page, shopping_cart))
         elif route.route == "/cesta":
-            page.add(cesta_view(page, shopping_cart))
+            page.add(cesta_view(page, shopping_cart, update_cart_count))
         elif route.route == "/login":
             page.add(login_view(page))
         elif route.route == "/compra":
-            page.add(compra_view(page, shopping_cart))
+            page.add(compra_view(page, shopping_cart, cart_count_text))
 
         page.update()
 
