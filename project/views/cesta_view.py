@@ -25,17 +25,19 @@ def cesta_view(page, shopping_cart):
                         content=ft.Column(
                             controls=[
                                 ft.Image(
-                                    src=obtener_imagen_producto_id(item.id),
-                                    width=100,
-                                    height=100,
+                                    src=obtener_imagen_producto_id(item[0].id),
+                                    width=150,
+                                    height=50,
                                     fit=ft.ImageFit.CONTAIN,
                                 ),
-                                ft.Text(item.name, weight="bold"),
-                                ft.Text(f"Precio: {item.price}€"),
+                                ft.Text(item[0].name, weight="bold"),
+                                ft.Text(f"Precio: {item[0].price}€"),
+                                ft.Text(f"Cantidad: {item[1]}", style="bodySmall", color=ft.colors.BLUE_500),
                                 ft.ElevatedButton(
                                     "Ver detalles",
-                                    on_click=lambda e, item=item: open_product_details(page, item),
+                                    on_click=lambda e, product=item: open_product_details(page, product),
                                 ),
+                                ft.Text(f"Precio total: {float(item[0].price) * item[1]}€", color=ft.colors.RED_600),
                             ],
                             spacing=5,
                             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
@@ -44,6 +46,7 @@ def cesta_view(page, shopping_cart):
                         width=200,
                         height=250,
                         alignment=ft.alignment.center,
+
                     ),
                     elevation=3,
                     margin=5,
@@ -73,22 +76,34 @@ def cesta_view(page, shopping_cart):
                     on_click=lambda e: page.go("/compra"),
                 )
             )
+
+            page.add(
+                ft.ElevatedButton(
+                    "Vaciar cesta",
+                    icon=ft.icons.DELETE,
+                    color=ft.colors.WHITE,
+                    bgcolor=ft.colors.RED_600,
+                    on_click=clear_cart,
+                )
+            )
         else:
             # Mensaje de cesta vacía
             page.add(
-                ft.Text("Tu cesta está vacía 🫙", style="bodyLarge", color=ft.colors.RED_400)
+                ft.Container(
+                    content=ft.Text(
+                        "🫙 Tu cesta está vacía 🫙",
+                        style="headlineLarge",
+                        weight="bold",
+                        color=ft.colors.RED_500,
+                        text_align=ft.TextAlign.CENTER,
+                    ),
+                    alignment=ft.alignment.center,
+                    expand=True,
+                )
             )
 
         # Botón para vaciar la cesta
-        page.add(
-            ft.ElevatedButton(
-                "Vaciar cesta",
-                icon=ft.icons.DELETE,
-                color=ft.colors.WHITE,
-                bgcolor=ft.colors.RED_600,
-                on_click=clear_cart,
-            )
-        )
+
 
         page.update()
 
@@ -100,12 +115,13 @@ def cesta_view(page, shopping_cart):
         update_cart_view()
 
     # Función para abrir el diálogo de detalles del producto
-    def open_product_details(page, product):
+    def open_product_details(page, product_list):
         """
         Abre un diálogo emergente que permite ajustar la cantidad de un producto
         y añadirlo a la cesta con la cantidad seleccionada.
         """
-        quantity = 1  # Cantidad inicial
+        quantity = product_list[1] # Cantidad inicial
+        product = product_list[0]
 
         # Actualizar la cantidad mostrada
         def update_quantity_display():
@@ -115,8 +131,19 @@ def cesta_view(page, shopping_cart):
         # Aumentar la cantidad
         def increment_quantity(e):
             nonlocal quantity
-            quantity += 1
-            update_quantity_display()
+            if check_stock():
+                quantity += 1
+                update_quantity_display()
+                add_to_cart_with_quantity(e)
+            else:
+                dialog.open = False
+                page.snack_bar = ft.SnackBar(
+                    ft.Text(f"No hay más unidades de {product.name} disponibles en stock."),
+                    bgcolor=ft.colors.RED,
+                )
+                page.snack_bar.open = True
+                page.update()  # Actualiza la página para que el SnackBar se muestre
+
 
         # Disminuir la cantidad
         def decrement_quantity(e):
@@ -124,14 +151,23 @@ def cesta_view(page, shopping_cart):
             if quantity > 1:
                 quantity -= 1
                 update_quantity_display()
+            elif quantity == 1:
+                quantity -= 1
+                shopping_cart.remove(product_list)
+                dialog.open = False
+                update_quantity_display()
+
+            add_to_cart_with_quantity(e)
+
+        def check_stock() -> bool:
+            stock_in_db = product.stock
+            return quantity < stock_in_db
 
         # Añadir a la cesta con la cantidad seleccionada
         def add_to_cart_with_quantity(e):
-            for _ in range(quantity):
-                shopping_cart.append(product)
+            product_list[1] = quantity
             page.snack_bar = ft.SnackBar(ft.Text(f"{quantity} x {product.name} añadido(s) a la cesta"))
             page.snack_bar.open = True
-            dialog.open = False
             dialog.update()
             update_cart_view()  # Actualiza la vista del carrito
 
@@ -155,7 +191,6 @@ def cesta_view(page, shopping_cart):
                         alignment=ft.MainAxisAlignment.CENTER,
                         spacing=20,
                     ),
-                    ft.ElevatedButton("Añadir a la cesta", on_click=add_to_cart_with_quantity),
                     ft.ElevatedButton("Cerrar", on_click=lambda e: close_dialog()),
                 ],
                 spacing=10,

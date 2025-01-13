@@ -356,7 +356,7 @@ def obtener_imagen_producto_id(producto_id):
         producto_id (int): El ID del producto cuya imagen se quiere abrir.
     """
     try:
-        ruta_imagen = f"../imagens/{producto_id}.jpg"
+        ruta_imagen = f"../images/{producto_id}.jpg"
         if os.path.exists(ruta_imagen):
             return ruta_imagen
         else:
