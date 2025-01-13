@@ -4,6 +4,7 @@ from project.views.header import header
 from project.views.cesta_view import cesta_view
 from project.views.login_view import login_view
 from project.views.compra_view import compra_view
+from project.views.user_view import user_view
 
 shopping_cart = []
 
@@ -24,6 +25,8 @@ def main(page: ft.Page):
             page.add(login_view(page))
         elif route.route == "/compra":
             page.add(compra_view(page, shopping_cart))
+        else:
+            page.add(user_view(page))
 
         page.update()
 
