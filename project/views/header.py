@@ -1,16 +1,17 @@
 import flet as ft
 import os
 
+cart_count_text = ft.Text(f"Cesta (0)", style="bodyLarge")
+def update_cart_count(shopping_cart):
+    cart_count_text.value = f"Cesta ({len(shopping_cart)})"
+    cart_count_text.update()
 def header(page, shopping_cart):
-    cart_count_text = ft.Text(f"Cesta ({len(shopping_cart)})", style="bodyLarge")
 
     # Actualizar el contador de productos
-    def update_cart_count():
-        cart_count_text.value = f"Cesta ({len(shopping_cart)})"
-        cart_count_text.update()
+
 
     home_button = ft.ElevatedButton("Inicio", on_click=lambda e: page.go("/"))
-    cart_button = ft.ElevatedButton("Cesta", on_click=lambda e: [page.go("/cesta"), update_cart_count()])
+    cart_button = ft.ElevatedButton("Cesta", on_click=lambda e: [page.go("/cesta"), update_cart_count(shopping_cart)])
     user_button = ft.ElevatedButton(
         text="Perfil",
         icon=ft.icons.PERSON,

@@ -1,5 +1,6 @@
 import flet as ft
 from project.database.crud_entero import get_product, obtener_imagen_producto_id
+from project.views.header import update_cart_count
 
 # Obtener los productos desde la base de datos
 items = get_product()
@@ -12,7 +13,6 @@ def home_view(page, shopping_cart):
     Genera la vista principal de productos, mostrando cada uno con su imagen y permitiendo añadirlos al carrito.
     """
     products = [i for i in items]  # Lista de productos obtenidos
-
     # Agregar productos a la cesta
     def add_to_cart(e):
         product = e.control.data
@@ -22,6 +22,7 @@ def home_view(page, shopping_cart):
                 break
         else:
             shopping_cart.append([product,1])
+            update_cart_count(shopping_cart)
         page.snack_bar = ft.SnackBar(ft.Text(f"{product.name} añadido a la cesta"))
         page.snack_bar.open = True
         page.update()
