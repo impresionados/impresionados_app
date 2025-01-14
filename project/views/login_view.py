@@ -1,7 +1,6 @@
 import flet as ft
 from project.utils.autenticar_usr import autenticar
-from project.database.crud import registrar_usuario
-from project.database.crud_entero import update_user, get_user_by_email
+from project.database.crud_entero import update_user, create_user
 from mongoengine import get_db
 
 
@@ -69,7 +68,7 @@ def login_view(page):
                 register_message.color = ft.colors.RED
             else:
                 # Llamar a la función de registro
-                if registrar_usuario({"usuario": username, "email": email, "password": password}):
+                if create_user(username, email, password):
                     register_message.value = "Registro exitoso. Ahora puede iniciar sesión."
                     register_message.color = ft.colors.GREEN
                     close_register_view()  # Cerrar el modal tras el registro exitoso
