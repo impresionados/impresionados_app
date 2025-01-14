@@ -97,7 +97,8 @@ def registrar_usuario(data: dict) -> bool:
             users_collection.insert_one({
                 "usuario": data["usuario"],
                 "email": data["email"],
-                "password": data["password"]  
+                "password": data["password"],
+                "registration_date": f"{datetime.now()}"  
             })
             print("Usuario registrado correctamente.")
             return True

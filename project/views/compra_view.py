@@ -1,6 +1,7 @@
 import flet as ft
-from project.views.header import header
-from project.database.crud_entero import *
+from project.views.header import header, update_cart_count
+from project.database.crud_entero import update_product
+
 # Variable con la dirección
 default_address = "Calle Falsa 123, Madrid, España"
 
@@ -21,12 +22,20 @@ def compra_view(page, shopping_cart, cart_count_text):
             page.snack_bar = ft.SnackBar(ft.Text("Por favor, elige un método de pago."))
             page.snack_bar.open = True
         else:
-            for item in shopping_cart:
-                delete_product(str(item[0].id))
-            shopping_cart.clear()
+
             page.snack_bar = ft.SnackBar(ft.Text("¡COMPRA REALIZADA! 🎉"))
             page.snack_bar.open = True
+            restar_stock(page, shopping_cart)
+            shopping_cart.clear()
             page.go("/")  # Redirige al home después de la compra
+
+    def restar_stock(page, shopping_cart):
+        for products in shopping_cart:
+            product = products[0]
+            quantity = products[1]
+            product.stock -= quantity
+            product.save()
+        update_cart_count(page, shopping_cart)
 
     page.controls.clear()
     page.add(header(page, shopping_cart, cart_count_text))

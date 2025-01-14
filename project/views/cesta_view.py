@@ -2,8 +2,7 @@ import flet as ft
 from project.views.header import header
 from project.database.crud_entero import obtener_imagen_producto_id
 
-
-def cesta_view(page, shopping_cart, update_cart_count, cart_count_text):
+def cesta_view(page, shopping_cart):
     """
     Vista de la cesta de compras que muestra los productos agregados,
     permite ajustar cantidades y ver detalles de cada producto.
@@ -12,82 +11,76 @@ def cesta_view(page, shopping_cart, update_cart_count, cart_count_text):
     # Actualizar la vista de la cesta
     def update_cart_view():
         page.controls.clear()
-        page.add(header(page, shopping_cart, cart_count_text))
+        page.add(header(page, shopping_cart))
 
-        # Título de la cesta
-        page.add(ft.Text("🛒 Cesta de Compras", style="headlineMedium", weight="bold"))
-
-        # Si hay productos en la cesta
-        if shopping_cart:
-            product_cards = [
-                ft.Card(
-                    content=ft.Container(
-                        content=ft.Column(
-                            controls=[
-                                ft.Image(
-                                    src=obtener_imagen_producto_id(item[0].id),
-                                    width=150,
-                                    height=50,
-                                    fit=ft.ImageFit.CONTAIN,
-                                ),
-                                ft.Text(item[0].name, weight="bold"),
-                                ft.Text(f"Precio: {item[0].price}€"),
-                                ft.Text(f"Cantidad: {item[1]}", style="bodySmall", color=ft.colors.BLUE_500),
-                                ft.ElevatedButton(
-                                    "Ver detalles",
-                                    on_click=lambda e, product=item: open_product_details(page, product),
-                                ),
-                                ft.Text(f"Precio total: {float(item[0].price) * item[1]}€", color=ft.colors.RED_600),
-                            ],
-                            spacing=5,
-                            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+        # Contenedor principal con título y productos
+        page.add(
+            ft.Container(
+                content=ft.Column(
+                    controls=[
+                        # Título de la cesta
+                        ft.Text(
+                            "🛒 Cesta de Compras",
+                            style="headlineLarge",
+                            color=ft.colors.BLUE_GREY_900,
+                            weight=ft.FontWeight.BOLD,
                         ),
-                        padding=10,
-                        width=200,
-                        height=250,
-                        alignment=ft.alignment.center,
-
-                    ),
-                    elevation=3,
-                    margin=5,
-                )
-                for item in shopping_cart
-            ]
-
-            # Añadir los productos al GridView
-            page.add(
-                ft.GridView(
-                    controls=product_cards,
-                    runs_count=2,
-                    spacing=10,
-                    run_spacing=10,
-                    max_extent=220,
-                    expand=1,
-                )
+                        # Si hay productos en la cesta
+                        ft.GridView(
+                            controls=[
+                                ft.Card(
+                                    content=ft.Container(
+                                        content=ft.Column(
+                                            controls=[
+                                                ft.Image(
+                                                    src=obtener_imagen_producto_id(item[0].id),
+                                                    width=150,
+                                                    height=150,
+                                                    fit=ft.ImageFit.CONTAIN,
+                                                ),
+                                                ft.Text(item[0].name, weight="bold"),
+                                                ft.Text(f"Precio: {item[0].price}€"),
+                                                ft.Text(f"Cantidad: {item[1]}", style="bodySmall", color=ft.colors.BLUE_500),
+                                                ft.Text(
+                                                    f"Precio total: {float(item[0].price) * item[1]}€",
+                                                    color=ft.colors.RED_600,
+                                                    weight="bold",
+                                                ),
+                                                ft.ElevatedButton(
+                                                    "Ver detalles",
+                                                    on_click=lambda e, product=item: open_product_details(page, product),
+                                                ),
+                                            ],
+                                            spacing=10,
+                                            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                                        ),
+                                        padding=15,
+                                        alignment=ft.alignment.center,
+                                        border_radius=10,
+                                        bgcolor=ft.colors.WHITE,
+                                    ),
+                                    elevation=3,
+                                    margin=10,
+                                )
+                                for item in shopping_cart
+                            ],
+                            runs_count=2,
+                            spacing=20,
+                            run_spacing=20,
+                            max_extent=450,
+                            expand=1,
+                        ),
+                    ],
+                    alignment=ft.MainAxisAlignment.START,
+                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                    spacing=20,
+                ),
+                padding=20,
             )
+        )
 
-            # Botón para proceder a la compra
-            page.add(
-                ft.ElevatedButton(
-                    "Comprar ahora",
-                    icon=ft.icons.SHOPPING_CART,
-                    color=ft.colors.WHITE,
-                    bgcolor=ft.colors.GREEN_700,
-                    on_click=lambda e: page.go("/compra"),
-                )
-            )
-
-            page.add(
-                ft.ElevatedButton(
-                    "Vaciar cesta",
-                    icon=ft.icons.DELETE,
-                    color=ft.colors.WHITE,
-                    bgcolor=ft.colors.RED_600,
-                    on_click=clear_cart,
-                )
-            )
-        else:
-            # Mensaje de cesta vacía
+        # Si la cesta está vacía
+        if not shopping_cart:
             page.add(
                 ft.Container(
                     content=ft.Text(
@@ -102,8 +95,30 @@ def cesta_view(page, shopping_cart, update_cart_count, cart_count_text):
                 )
             )
 
-        # Botón para vaciar la cesta
-
+        # Botones "Comprar ahora" y "Vaciar cesta"
+        if shopping_cart:
+            page.add(
+                ft.Row(
+                    controls=[
+                        ft.ElevatedButton(
+                            "Comprar ahora",
+                            icon=ft.icons.SHOPPING_CART,
+                            color=ft.colors.WHITE,
+                            bgcolor=ft.colors.GREEN_700,
+                            on_click=lambda e: page.go("/compra"),
+                        ),
+                        ft.ElevatedButton(
+                            "Vaciar cesta",
+                            icon=ft.icons.DELETE,
+                            color=ft.colors.WHITE,
+                            bgcolor=ft.colors.RED_600,
+                            on_click=clear_cart,
+                        ),
+                    ],
+                    alignment=ft.MainAxisAlignment.CENTER,
+                    spacing=20,
+                )
+            )
 
         page.update()
 
@@ -120,21 +135,27 @@ def cesta_view(page, shopping_cart, update_cart_count, cart_count_text):
         Abre un diálogo emergente que permite ajustar la cantidad de un producto
         y añadirlo a la cesta con la cantidad seleccionada.
         """
-        quantity = product_list[1] # Cantidad inicial
+        quantity = product_list[1]  # Cantidad inicial
         product = product_list[0]
 
+        def add_to_cart_with_quantity(e):
+            product_list[1] = quantity
+            page.snack_bar = ft.SnackBar(ft.Text(f"{quantity} x {product.name} añadido(s) a la cesta"))
+            page.snack_bar.open = True
+            dialog.update()
+            update_cart_view()  # Actualiza la vista del carrito
         # Actualizar la cantidad mostrada
         def update_quantity_display():
             quantity_display.value = str(quantity)
-            quantity_display.update()  # Actualiza solo el control de cantidad
+            quantity_display.update()
 
         # Aumentar la cantidad
         def increment_quantity(e):
             nonlocal quantity
             if check_stock():
                 quantity += 1
-                update_quantity_display()
                 add_to_cart_with_quantity(e)
+                update_quantity_display()
             else:
                 dialog.open = False
                 page.snack_bar = ft.SnackBar(
@@ -142,8 +163,8 @@ def cesta_view(page, shopping_cart, update_cart_count, cart_count_text):
                     bgcolor=ft.colors.RED,
                 )
                 page.snack_bar.open = True
-                page.update()  # Actualiza la página para que el SnackBar se muestre
-
+                dialog.update()
+            page.update()
 
         # Disminuir la cantidad
         def decrement_quantity(e):
@@ -158,18 +179,11 @@ def cesta_view(page, shopping_cart, update_cart_count, cart_count_text):
                 update_quantity_display()
 
             add_to_cart_with_quantity(e)
-
         def check_stock() -> bool:
             stock_in_db = product.stock
+            print(quantity)
+            print(stock_in_db)
             return quantity < stock_in_db
-
-        # Añadir a la cesta con la cantidad seleccionada
-        def add_to_cart_with_quantity(e):
-            product_list[1] = quantity
-            page.snack_bar = ft.SnackBar(ft.Text(f"{quantity} x {product.name} añadido(s) a la cesta"))
-            page.snack_bar.open = True
-            dialog.update()
-            update_cart_view()  # Actualiza la vista del carrito
 
         # Mostrar la cantidad
         quantity_display = ft.Text(value=str(quantity), size=20, weight="bold")
@@ -201,10 +215,8 @@ def cesta_view(page, shopping_cart, update_cart_count, cart_count_text):
         page.show_dialog(dialog)
 
         def close_dialog():
-            dialog.open = False  # Cierra el diálogo
-            dialog.update()  # Actualiza solo el diálogo
-            update_cart_view()
-            page.update()
+            dialog.open = False
+            dialog.update()
 
     # Inicializar la vista
     update_cart_view()

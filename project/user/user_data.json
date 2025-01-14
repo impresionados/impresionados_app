@@ -1,7 +1,8 @@
 {
-    "_id": "1",
-    "user_name": "user_1",
-    "email": "user_1@example.com",
-    "password": "password_1",
-    "registration_date": "2024-12-10 09:36:51.238000"
+
+    "_id": "6783f671b87f37a811d630eb",
+    "usuario": "al",
+    "email": "al@al",
+    "password": "1234",
+    "registration_date": "2025-01-12 17:05:53.188707"
 }

@@ -8,50 +8,11 @@ max_text_len = 40
 
 # Función para la vista principal
 def home_view(page, shopping_cart):
+
+    """
+    Genera la vista principal de productos, mostrando cada uno con su imagen y permitiendo añadirlos al carrito.
+    """
     products = [i for i in items]  # Lista de productos obtenidos
-
-    # Función para aplicar filtro
-    def apply_filter(e):
-        filter_text = search_field.value.lower()
-        filtered_products = [p for p in items if filter_text in p.name.lower() or filter_text in p.category]
-        update_product_grid(filtered_products)
-
-    # Actualizar la vista del grid con los productos filtrados
-    def update_product_grid(product_list):
-        product_cards.clear()
-        for product in product_list:
-            product_cards.append(ft.Card(
-                content=ft.Container(
-                    content=ft.Column(
-                        controls=[
-                            ft.Image(src=obtener_imagen_producto_id(product.id), width=180, height=180),
-                            ft.Text(f"{product.name[:20]}..." if len(product.name) > 20 else product.name,
-                                    style="titleSmall", color=ft.colors.BLUE_GREY_800),
-                            ft.Text(f"{product.description[:max_text_len]}..." if len(product.description) > max_text_len else product.description,
-                                    max_lines=3, overflow=ft.TextOverflow.ELLIPSIS, style="bodyMedium", color=ft.colors.GREY_600),
-                            ft.Text(f"{product.price}€", style="bodyLarge", color=ft.colors.GREEN_700, weight=ft.FontWeight.BOLD),
-                            ft.Row(
-                                controls=[
-                                    ft.ElevatedButton("Añadir a la cesta", on_click=add_to_cart, data=product),
-                                    ft.TextButton("Ver más", on_click=open_product_details, data=product)
-                                ],
-                                alignment=ft.MainAxisAlignment.CENTER,
-                                spacing=10
-                            )
-                        ],
-                        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                        spacing=15
-                    ),
-                    padding=15,
-                    alignment=ft.alignment.center,
-                    border_radius=10,
-                    bgcolor=ft.colors.WHITE
-                ),
-                elevation=10,
-                margin=10
-            ))
-        page.update()
-
     # Agregar productos a la cesta
     def add_to_cart(e):
         product = e.control.data
@@ -69,7 +30,7 @@ def home_view(page, shopping_cart):
                     page.update()
                     break
         else:
-            shopping_cart.append([product, 1])
+            shopping_cart.append([product,1])
             update_cart_count(page, shopping_cart)
         page.snack_bar = ft.SnackBar(ft.Text(f"{product.name} añadido a la cesta"))
         page.snack_bar.open = True
@@ -104,7 +65,7 @@ def home_view(page, shopping_cart):
     product_cards = []
     update_product_grid(products)
 
-    # Vista principal
+
     return ft.Container(
         content=ft.Column(
             controls=[
@@ -122,7 +83,14 @@ def home_view(page, shopping_cart):
             height=page.window_width*50/100,
             spacing=20,
             expand=True,
-            scroll=ft.ScrollMode.ALWAYS
+            scroll=ft.ScrollMode.ALWAYS,
         ),
         padding=20,
     )
+
+
+
+
+
+
+
