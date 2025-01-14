@@ -1,11 +1,11 @@
 import flet as ft
 from project.views.header import header, update_cart_count
 from project.database.crud_entero import update_product
-
+from project.views.header import update_cart_count
 # Variable con la dirección
 default_address = "Calle Falsa 123, Madrid, España"
 
-def compra_view(page, shopping_cart, cart_count_text):
+def compra_view(page, shopping_cart):
     # Opciones de pago
     payment_methods = ["Visa", "MasterCard", "PayPal"]
     selected_payment = ft.Dropdown(
@@ -38,7 +38,7 @@ def compra_view(page, shopping_cart, cart_count_text):
         update_cart_count(page, shopping_cart)
 
     page.controls.clear()
-    page.add(header(page, shopping_cart, cart_count_text))
+    page.add(header(page, shopping_cart))
     page.add(ft.Text("Zona de Compra", style="headlineMedium"))
     page.add(ft.Text(f"Dirección: {default_address}"))
     page.add(selected_payment)
