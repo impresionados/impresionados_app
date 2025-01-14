@@ -22,12 +22,12 @@ def main(page: ft.Page):
 
     def on_route_change(route):
         page.controls.clear()
-        page.add(header(page, shopping_cart, cart_count_text))
+        page.add(header(page, shopping_cart))
 
         if route.route == "/":
-            page.add(home_view(page, shopping_cart, update_cart_count))
+            page.add(home_view(page, shopping_cart))
         elif route.route == "/cesta":
-            page.add(cesta_view(page, shopping_cart, update_cart_count))
+            page.add(cesta_view(page, shopping_cart))
         elif route.route == "/login":
             page.add(login_view(page))
         elif route.route == "/compra":

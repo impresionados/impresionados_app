@@ -6,9 +6,10 @@ import flet as ft
 def user_view(page):
     # Leer los datos del usuario desde el archivo JSON
     user_data = {}
-    if os.path.isfile("user/user_data.json"):
+    user_data_file = "user/user_data.json"
+    if os.path.isfile(user_data_file):
         try:
-            with open("user/user_data.json", "r") as file:
+            with open(user_data_file, "r") as file:
                 user_data = json.load(file)
         except json.JSONDecodeError:
             print("Error al leer el archivo JSON.")
@@ -37,6 +38,12 @@ def user_view(page):
         password_field.suffix.icon = ft.icons.VISIBILITY if password_visible else ft.icons.VISIBILITY_OFF
         page.update()
 
+    def close_session():
+        page.snack_bar = ft.SnackBar(ft.Text("Cerrando sesión", size=16, color=ft.colors.WHITE), bgcolor=ft.colors.RED_600)
+        page.snack_bar.open = True
+        page.update()
+        os.remove(user_data_file)
+
     password_field = ft.TextField(
         label="Contraseña",
         value=user_data.get("password", "N/A"),
@@ -48,6 +55,8 @@ def user_view(page):
             on_click=toggle_password_visibility,
         ),
     )
+
+    close_button = ft.ElevatedButton("Cerrar sesión", on_click=lambda e: [close_session(), page.go("/")])
 
     # Contenedor para toda la vista
     return ft.Container(
@@ -78,7 +87,8 @@ def user_view(page):
 
                         ],
                         alignment=ft.MainAxisAlignment.END,
-                    )
+                    ),
+                    close_button
                 ],
             ),
         )

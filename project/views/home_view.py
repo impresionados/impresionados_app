@@ -4,10 +4,9 @@ from project.views.header import update_cart_count
 
 # Obtener los productos desde la base de datos
 items = get_product()
-shopping_cart = []  # Lista para almacenar los productos añadidos
 max_text_len = 40
 # Función para la vista principal
-def home_view(page, shopping_cart, update_cart_count):
+def home_view(page, shopping_cart):
     """
     Genera la vista principal de productos, mostrando cada uno con su imagen y permitiendo añadirlos al carrito.
     """
@@ -16,9 +15,16 @@ def home_view(page, shopping_cart, update_cart_count):
     def add_to_cart(e):
         product = e.control.data
         for product_in_cart in shopping_cart:
-            if product_in_cart[0] == product:
+            if product_in_cart[0] == product and not product_in_cart[1] == product_in_cart[0].stock:
                 product_in_cart[1] += 1
-                break
+            else:
+                page.snack_bar = ft.SnackBar(
+                    ft.Text(f"No hay más unidades de {product.name} disponibles en stock."),
+                    bgcolor=ft.colors.RED,
+                )
+                page.snack_bar.open = True
+                page.update()
+            break
         else:
             shopping_cart.append([product,1])
             update_cart_count(shopping_cart)
