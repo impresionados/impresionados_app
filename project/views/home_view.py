@@ -15,19 +15,21 @@ def home_view(page, shopping_cart):
     def add_to_cart(e):
         product = e.control.data
         for product_in_cart in shopping_cart:
-            if product_in_cart[0] == product and not product_in_cart[1] == product_in_cart[0].stock:
-                product_in_cart[1] += 1
-            else:
-                page.snack_bar = ft.SnackBar(
-                    ft.Text(f"No hay más unidades de {product.name} disponibles en stock."),
-                    bgcolor=ft.colors.RED,
-                )
-                page.snack_bar.open = True
-                page.update()
-            break
+            if product_in_cart[0] == product:
+                if not product_in_cart[1] == product_in_cart[0].stock:
+                    product_in_cart[1] += 1
+                    break
+                else:
+                    page.snack_bar = ft.SnackBar(
+                        ft.Text(f"No hay más unidades de {product.name} disponibles en stock."),
+                        bgcolor=ft.colors.RED,
+                    )
+                    page.snack_bar.open = True
+                    page.update()
+                    break
         else:
             shopping_cart.append([product,1])
-            update_cart_count(shopping_cart)
+            update_cart_count(page, shopping_cart)
         page.snack_bar = ft.SnackBar(ft.Text(f"{product.name} añadido a la cesta"))
         page.snack_bar.open = True
         page.update()
@@ -104,6 +106,7 @@ def home_view(page, shopping_cart):
         for product in products
     ]
 
+
     # Uso de GridView para mostrar los productos con scroll
     return ft.Container(
         content=ft.Column(
@@ -115,12 +118,20 @@ def home_view(page, shopping_cart):
                     spacing=20,
                     run_spacing=20,
                     max_extent=450,
-                    expand=1
+                    expand=1,
                 )
             ],
-            alignment=ft.MainAxisAlignment.START,
-            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-            spacing=20  # Añadido espacio extra para evitar que los botones toquen el borde
+            height=page.window_width*50/100,
+            spacing=20,
+            expand=True,
+            scroll=ft.ScrollMode.ALWAYS  # Scroll activado en el Column
         ),
-        padding=20
+        padding=20,
     )
+
+
+
+
+
+
+

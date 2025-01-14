@@ -14,12 +14,6 @@ def main(page: ft.Page):
     page.update()
 
     # Crear la cabecera y definir la función para actualizarla
-    cart_count_text = ft.Text(f"Cesta ({len(shopping_cart)})")
-
-    def update_cart_count():
-        cart_count_text.value = f"Cesta ({len(shopping_cart)})"
-        cart_count_text.update()
-
     def on_route_change(route):
         page.controls.clear()
         page.add(header(page, shopping_cart))

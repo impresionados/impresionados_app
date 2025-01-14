@@ -1,24 +1,27 @@
 import flet as ft
 import os
 
-
-cart_count_text = ft.Text(f"Cesta (0)", style="bodyLarge")
-def update_cart_count(shopping_cart):
-    cart_count_text.value = f"Cesta ({len(shopping_cart)})"
-    cart_count_text.update()
 def header(page, shopping_cart):
+    # Crear el contador de la cesta y almacenarlo en la página
+    page.cart_count_text = ft.Text(f"Cesta ({len(shopping_cart)})", style="bodyLarge")
 
-    # Actualizar el contador de productos
+    # Botón de inicio
+    home_button = ft.ElevatedButton(
+        "Inicio",
+        width=150,
+        height=35,
+        on_click=lambda e: page.go("/")
+    )
 
+    # Botón de cesta
+    cart_button = ft.ElevatedButton(
+        "Cesta",
+        width=150,
+        height=35,
+        on_click=lambda e: [page.go("/cesta"), update_cart_count(page, shopping_cart)]
+    )
 
-    home_button = ft.ElevatedButton("Inicio",
-                                    width=150,  # Ajusta el ancho del botón
-                                    height=35,  # Ajusta la altura del botón
-                                    on_click=lambda e: page.go("/"),)
-    cart_button = ft.ElevatedButton("Cesta",
-                                    width=150,  # Ajusta el ancho del botón
-                                    height=35,  # Ajusta la altura del botón
-                                    on_click=lambda e: [page.go("/cesta"), update_cart_count(shopping_cart)])
+    # Botón de perfil
     user_button = ft.ElevatedButton(
         text="Perfil",
         icon=ft.icons.PERSON,
@@ -29,45 +32,43 @@ def header(page, shopping_cart):
         ),
     )
 
+    # Retornar el layout del header
     return ft.Row(
-    controls=[
-        # Sección izquierda: Icono y texto "Tienda 3D"
-        ft.Row(
-            controls=[
-                ft.Icon(ft.icons.STORE, size=30, color=ft.colors.BLUE_GREY),
-                ft.Text(
-                    "Tienda 3D",
-                    size=28,
-                    weight=ft.FontWeight.BOLD,
-                    color=ft.colors.BLUE_800,
-                    text_align=ft.TextAlign.LEFT,
-                ),
-            ],
-            spacing=5,
-            expand=1,
-        ),
+        controls=[
+            # Sección izquierda
+            ft.Row(
+                controls=[
+                    ft.Icon(ft.icons.STORE, size=30, color=ft.colors.BLUE_GREY),
+                    ft.Text(
+                        "Tienda 3D",
+                        size=28,
+                        weight=ft.FontWeight.BOLD,
+                        color=ft.colors.BLUE_800,
+                        text_align=ft.TextAlign.LEFT,
+                    ),
+                ],
+                spacing=5,
+                expand=1,
+            ),
+            # Sección central
+            ft.Row(
+                controls=[home_button, cart_button],
+                alignment=ft.MainAxisAlignment.CENTER,
+                spacing=50,
+                expand=1,
+            ),
+            # Sección derecha
+            ft.Row(
+                controls=[page.cart_count_text, user_button],
+                alignment=ft.MainAxisAlignment.END,
+                expand=1,
+            ),
+        ],
+        alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+    )
 
-        # Sección central: Botones "Inicio" y "Cesta"
-        ft.Row(
-            controls=[
-                home_button,
-                cart_button,
-            ],
-            alignment=ft.MainAxisAlignment.CENTER,
-            spacing=50,
-            expand=1,
-        ),
 
-        # Sección derecha: Contador de cesta y botón de perfil
-        ft.Row(
-            controls=[
-                cart_count_text,
-                user_button,
-            ],
-            alignment=ft.MainAxisAlignment.END,
-            expand=1,
-        ),
-    ],
-    alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
-)
-
+# Función para actualizar el contador del carrito
+def update_cart_count(page, shopping_cart):
+    page.cart_count_text.value = f"Cesta ({len(shopping_cart)})"
+    page.cart_count_text.update()
