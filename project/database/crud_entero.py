@@ -117,7 +117,7 @@ def save_product_image(product, folder_path: str):
         print(f"Error al guardar la imagen del producto {product.id}: {e}")
 
 
-def get_product(product_id: str = "", category_list: list[str] = [], discard: bool = True) -> Product | mongoengine.QuerySet:
+def get_product(product_id: str = "", category_list = None, discard: bool = True) -> Product | mongoengine.QuerySet:
     """
     Obtiene un producto por su ID o todos los productos de la base de datos.
 
@@ -364,3 +364,54 @@ def obtener_imagen_producto_id(producto_id):
             print(f"No se encontró la imagen para el producto con ID {producto_id}.")
     except Exception as e:
         print(f"Error al abrir la imagen: {e}")
+
+
+#
+# CRUD FUNCTION FROM CATEGORY
+#
+
+def add_category(name: str) -> Category:
+    """
+    Añade una nueva categoría a la base de datos.
+    :param name: Nombre de la categoría.
+    :return: Objeto Category creado.
+    """
+    # Verificar si la categoría ya existe
+    existing_category = Category.objects(name=name).first()
+    if existing_category:
+        raise ValueError(f"La categoría '{name}' ya existe.")
+
+    # Crear y guardar la nueva categoría
+    new_category = Category(name=name)
+    new_category.save()
+    return new_category
+
+def delete_category_by_name(name: str) -> bool:
+    """
+    Elimina una categoría de la base de datos por su nombre.
+    :param name: Nombre de la categoría a eliminar.
+    :return: True si la categoría fue eliminada, False si no se encontró.
+    """
+    category_to_delete = Category.objects(name=name).first()
+    if not category_to_delete:
+        return False
+
+    category_to_delete.delete()
+    return True
+
+def get_category(category: Category = "") -> str|list[str]:
+    """
+    Devuelve el nombre de un objeto Category.
+    :param category: Objeto Category.
+    :return: Nombre de la categoría.
+
+    """
+    if not category:
+        categories = Category.objects()
+        categories = [category.name for category in categories]
+    elif not isinstance(category, Category):
+        raise TypeError("El objeto proporcionado no es una instancia de Category.")
+    else:
+        categories = category.name
+    return categories
+print(get_category())

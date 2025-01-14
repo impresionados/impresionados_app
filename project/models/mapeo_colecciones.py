@@ -1,3 +1,5 @@
+from symtable import Class
+
 import mongoengine
 import json
 from datetime import datetime
@@ -17,6 +19,12 @@ class Rating(mongoengine.EmbeddedDocument):  # To specify that it is inside anot
     comment = mongoengine.StringField()
     date = mongoengine.DateTimeField(required=True)
 
+
+# Definición de la clase Category como EmbeddedDocument
+class Category(mongoengine.EmbeddedDocument):
+    meta = {'collection': 'category'}  # To specify the collection being mapped
+
+    name = mongoengine.StringField(required=True)
 
 class Product(mongoengine.Document):
     meta = {'collection': 'products'}
@@ -40,3 +48,8 @@ class Order(mongoengine.Document):
     date = mongoengine.DateTimeField(required=True)
     total = mongoengine.FloatField(required=True)
     status = mongoengine.StringField(required=True)
+
+class Category(mongoengine.Document):
+    meta = {'collection': 'category'}
+
+    name = mongoengine.StringField(required=True)
