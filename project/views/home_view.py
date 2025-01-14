@@ -6,6 +6,9 @@ from project.views.header import update_cart_count
 items = get_product()
 max_text_len = 40
 
+# Lista global para almacenar las categorías seleccionadas
+selected_categories = []
+
 # Función para la vista principal
 def home_view(page, shopping_cart):
     products = [i for i in items]  # Lista de productos obtenidos
@@ -63,7 +66,9 @@ def home_view(page, shopping_cart):
         filtered_products = [p for p in items if filter_text in p.name.lower() or filter_text in p.category]
         update_product_grid(filtered_products)
 
+    # Función para aplicar el filtro por categorías seleccionadas
     def apply_filter_category(e, category_list):
+        global selected_categories
         selected_categories = [
             cb.label for cb in category_list.controls if isinstance(cb, ft.Checkbox) and cb.value
         ]
@@ -72,7 +77,67 @@ def home_view(page, shopping_cart):
         page.dialog.open = False
         page.update()
 
-    # Agregar productos a la cesta
+    # Función para manejar la selección/deselección de categorías
+    def toggle_category_selection(e, category):
+        if e.control.value:
+            if category not in selected_categories:
+                selected_categories.append(category)
+        else:
+            if category in selected_categories:
+                selected_categories.remove(category)
+
+    def deselect_all_categories(category_list):
+        global selected_categories
+        selected_categories = []
+        for cb in category_list.controls:
+            if isinstance(cb, ft.Checkbox):
+                cb.value = False
+        page.update()
+
+    # Función para abrir el diálogo de categorías
+    def open_category_dialog(e):
+        categories = list(set(get_category()))
+
+        # Crear una nueva lista de checkboxes con las categorías seleccionadas previamente
+        category_list = ft.Column(
+            controls=[
+                ft.Checkbox(
+                    label=cat,
+                    value=cat in selected_categories,  # Marcar las categorías seleccionadas previamente
+                    on_change=lambda e, cat=cat: toggle_category_selection(e, cat)
+                )
+                for cat in categories
+            ],
+            spacing=10
+        )
+
+        # Crear el diálogo
+        category_dialog = ft.AlertDialog(
+            title=ft.Text("Seleccionar categorías"),
+            content=ft.Container(
+                content=category_list,
+                height=400,
+                width=300,
+                padding=10
+            ),
+            actions=[
+                ft.TextButton("Deseleccionar todo", on_click=lambda e: deselect_all_categories(category_list)),
+                ft.TextButton("Aplicar", on_click=lambda e: apply_filter_category(e, category_list)),
+                ft.TextButton("Cerrar", on_click=lambda e: close_window(e))
+            ]
+        )
+
+        # Asignar y abrir el diálogo
+        page.dialog = category_dialog
+        page.dialog.open = True
+        page.update()
+
+    # Función para cerrar el diálogo
+    def close_window(e):
+        page.dialog.open = False
+        page.update()
+
+    # Función para añadir productos a la cesta
     def add_to_cart(e):
         product = e.control.data
         for product_in_cart in shopping_cart:
@@ -99,8 +164,6 @@ def home_view(page, shopping_cart):
     def open_product_details(e):
         product = e.control.data
 
-
-
         page.dialog = ft.AlertDialog(
             title=ft.Text(product.name, style="headlineMedium"),
             content=ft.Column(
@@ -117,39 +180,6 @@ def home_view(page, shopping_cart):
         )
         page.update()
 
-    def close_window(e):
-        page.dialog.open = False
-        page.update()
-
-    def open_category_dialog(e):
-        categories = list(set(get_category()))
-
-        # Crear una nueva lista de checkboxes
-        category_list = ft.Column(
-            controls=[ft.Checkbox(label=cat) for cat in categories],
-            spacing=10
-        )
-
-        # Crear un nuevo diálogo cada vez que se abra
-        category_dialog = ft.AlertDialog(
-            title=ft.Text("Seleccionar categorías"),
-            content=ft.Container(
-                content=category_list,
-                height=400,
-                width=300,
-                padding=10
-            ),
-            actions=[
-                ft.TextButton("Aplicar", on_click=lambda e: apply_filter_category(e, category_list)),
-                ft.TextButton("Cerrar", on_click=lambda e: close_window(e))
-            ]
-        )
-
-        # Asignar el nuevo diálogo a la página y abrirlo
-        page.dialog = category_dialog
-        page.dialog.open = True
-        page.update()
-
     # Campo de búsqueda y grid
     search_field = ft.TextField(label="Buscar productos...", on_change=apply_filter_name)
     update_product_grid(products)
@@ -157,7 +187,6 @@ def home_view(page, shopping_cart):
     # Campo de filtrado por categoría
     category_button = ft.ElevatedButton("Filtrar por categoría", on_click=open_category_dialog)
     update_product_grid(products)
-
 
     # Vista principal
     return ft.Container(
@@ -168,7 +197,7 @@ def home_view(page, shopping_cart):
                 category_button,
                 product_cards
             ],
-            height=page.window_width*50/100,
+            height=page.window_width * 50 / 100,
             spacing=20,
             expand=True,
             scroll=ft.ScrollMode.ALWAYS

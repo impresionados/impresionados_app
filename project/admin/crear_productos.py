@@ -52,7 +52,6 @@ def main(page):
         print("Categorías seleccionadas:", selected_categories)
 
     # Función para mostrar el diálogo de selección de categorías
-    # Función para mostrar el diálogo de selección de categorías
     def show_category_dialog(e):
         page.dialog = ft.AlertDialog(
             title=ft.Text("Selecciona las categorías"),
