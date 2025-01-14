@@ -13,7 +13,6 @@ def main(page: ft.Page):
     page.theme_mode = ft.ThemeMode.LIGHT
     page.update()
 
-    # Crear la cabecera y definir la función para actualizarla
     def on_route_change(route):
         page.controls.clear()
         page.add(header(page, shopping_cart))
