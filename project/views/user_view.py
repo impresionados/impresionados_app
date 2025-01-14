@@ -19,13 +19,13 @@ def user_view(page):
     # Crear los campos para mostrar los datos
     user_field = ft.TextField(
         label="Usuario",
-        value=user_data.get("usuario", "N/A"),
+        value=user_data.get("user_name"),
         read_only=True,
         prefix_icon=ft.icons.PERSON,
     )
     email_field = ft.TextField(
         label="Correo Electrónico",
-        value=user_data.get("email", "N/A"),
+        value=user_data.get("email"),
         read_only=True,
         prefix_icon=ft.icons.EMAIL,
     )
@@ -46,7 +46,7 @@ def user_view(page):
 
     password_field = ft.TextField(
         label="Contraseña",
-        value=user_data.get("password", "N/A"),
+        value=user_data.get("password"),
         password=True,
         read_only=True,
         expand=True,

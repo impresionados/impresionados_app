@@ -19,7 +19,11 @@ def home_view(page, shopping_cart):
     # Actualizar la vista del grid con los productos filtrados
     def update_product_grid(product_list):
         product_cards.controls.clear()
+
         for product in product_list:
+            is_in_cart = any(p[0] == product for p in shopping_cart)  # Verificar si el producto está en la cesta
+            button_color_add_cart = ft.colors.GREEN_600 if is_in_cart else ft.colors.RED_600  # Color dinámico
+
             product_cards.controls.append(ft.Card(
                 content=ft.Container(
                     content=ft.Column(
@@ -31,21 +35,70 @@ def home_view(page, shopping_cart):
                                 ),
                                 expand=True,
                                 alignment=ft.alignment.top_center,
-                                height=page.window_height * 0.25  # Ocupa el 50% de la altura disponible
+                                height=page.window_height * 0.25,  # Ajusstar imágen
                             ),
-                            ft.Text(f"{product.name[:20]}..." if len(product.name) > 20 else product.name,
-                                    style="titleSmall", color=ft.colors.BLUE_GREY_800),
-                            ft.Text(f"{product.description[:max_text_len]}..." if len(product.description) > max_text_len else product.description,
-                                    max_lines=3, overflow=ft.TextOverflow.ELLIPSIS, style="bodyMedium", color=ft.colors.GREY_600),
-                            ft.Text(f"{product.price}€", style="bodyLarge", color=ft.colors.GREEN_700, weight=ft.FontWeight.BOLD),
-                            ft.Row(
-                                controls=[
-                                    ft.ElevatedButton("Añadir a la cesta", on_click=add_to_cart, data=product),
-                                    ft.TextButton("Ver más", on_click=open_product_details, data=product)
-                                ],
-                                alignment=ft.MainAxisAlignment.CENTER,
-                                spacing=10
+                            ft.Container(
+                                content=ft.Column(
+                                    controls=[
+                                        ft.Text(
+                                            f"{product.name[:20]}..." if len(product.name) > 20 else product.name,
+                                            style="titleSmall",
+                                            color=ft.colors.BLUE_GREY_800
+                                        ),
+                                        ft.Text(
+                                            f"{product.description[:max_text_len]}..." if len(
+                                                product.description) > max_text_len else product.description,
+                                            max_lines=3,
+                                            overflow=ft.TextOverflow.ELLIPSIS,
+                                            style="bodyMedium",
+                                            color=ft.colors.GREY_600
+                                        ),
+                                        ft.Text(
+                                            f"{product.price}€",
+                                            style="bodyLarge",
+                                            color=ft.colors.GREEN_700,
+                                            weight=ft.FontWeight.BOLD
+                                        ),
+                                        ft.Row(
+                                            controls=[
+                                                ft.ElevatedButton(
+                                                    text="Añadir a la cesta" if not is_in_cart else "En la cesta",
+                                                    icon=ft.icons.ADD_SHOPPING_CART,
+                                                    style=ft.ButtonStyle(
+                                                        bgcolor=button_color_add_cart,
+                                                        color=ft.colors.WHITE,
+                                                        shape=ft.RoundedRectangleBorder(radius=8)
+                                                    ),
+                                                    on_click=add_to_cart,
+                                                    data=product
+                                                ),
+                                                ft.TextButton(
+                                                    text="Ver más",
+                                                    icon=ft.icons.ARROW_FORWARD,
+                                                    style=ft.ButtonStyle(
+                                                        bgcolor=ft.colors.BLUE_GREY_100,
+                                                        color=ft.colors.BLUE_GREY_800,
+                                                        shape=ft.RoundedRectangleBorder(radius=6),
+                                                        # padding=ft.EdgeInsets.symmetric(horizontal=10, vertical=6),
+                                                        overlay_color=ft.colors.BLUE_GREY_200,
+                                                    ),
+                                                    on_click=open_product_details,
+                                                    data=product
+                                                )
+                                            ],
+                                            alignment=ft.MainAxisAlignment.CENTER,
+                                            spacing=10
+                                        )
+                                    ],
+                                    spacing=10,
+                                    alignment=ft.MainAxisAlignment.START
+                                ),
+                                padding=15,
+                                alignment=ft.alignment.center,
+                                border_radius=10,
+                                bgcolor=ft.colors.WHITE
                             )
+
                         ],
                         horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                         spacing=15
@@ -156,9 +209,12 @@ def home_view(page, shopping_cart):
         else:
             shopping_cart.append([product, 1])
             update_cart_count(page, shopping_cart)
+
+        # Mostrar notificación
         page.snack_bar = ft.SnackBar(ft.Text(f"{product.name} añadido a la cesta"))
         page.snack_bar.open = True
-        page.update()
+
+        update_product_grid(products)
 
     # Abrir detalles del producto
     def open_product_details(e):
