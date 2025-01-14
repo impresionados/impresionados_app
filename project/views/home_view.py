@@ -1,5 +1,5 @@
 import flet as ft
-from project.database.crud_entero import get_product, obtener_imagen_producto_id
+from project.database.crud_entero import get_product, obtener_imagen_producto_id, get_category
 from project.views.header import update_cart_count
 
 # Obtener los productos desde la base de datos
@@ -11,7 +11,7 @@ def home_view(page, shopping_cart):
     products = [i for i in items]  # Lista de productos obtenidos
 
     # Crear una lista reactiva para los productos
-    product_cards = ft.GridView(runs_count=3, spacing=20, run_spacing=20, max_extent=450, expand=1)
+    product_cards = ft.GridView(runs_count=3, spacing=20, run_spacing=20, max_extent=390, expand=1)
 
     # Actualizar la vista del grid con los productos filtrados
     def update_product_grid(product_list):
@@ -21,7 +21,15 @@ def home_view(page, shopping_cart):
                 content=ft.Container(
                     content=ft.Column(
                         controls=[
-                            ft.Image(src=obtener_imagen_producto_id(product.id), width=180, height=180),
+                            ft.Container(
+                                content=ft.Image(
+                                    src=obtener_imagen_producto_id(product.id),
+                                    fit=ft.ImageFit.CONTAIN
+                                ),
+                                expand=True,
+                                alignment=ft.alignment.top_center,
+                                height=page.window_height * 0.25  # Ocupa el 50% de la altura disponible
+                            ),
                             ft.Text(f"{product.name[:20]}..." if len(product.name) > 20 else product.name,
                                     style="titleSmall", color=ft.colors.BLUE_GREY_800),
                             ft.Text(f"{product.description[:max_text_len]}..." if len(product.description) > max_text_len else product.description,
@@ -50,10 +58,19 @@ def home_view(page, shopping_cart):
         page.update()
 
     # Función para aplicar filtro
-    def apply_filter(e):
+    def apply_filter_name(e):
         filter_text = search_field.value.lower()
         filtered_products = [p for p in items if filter_text in p.name.lower() or filter_text in p.category]
         update_product_grid(filtered_products)
+
+    def apply_filter_category(e, category_list):
+        selected_categories = [
+            cb.label for cb in category_list.controls if isinstance(cb, ft.Checkbox) and cb.value
+        ]
+        filtered_products = [p for p in items if any(cat in p.category for cat in selected_categories)]
+        update_product_grid(filtered_products)
+        page.dialog.open = False
+        page.update()
 
     # Agregar productos a la cesta
     def add_to_cart(e):
@@ -82,9 +99,7 @@ def home_view(page, shopping_cart):
     def open_product_details(e):
         product = e.control.data
 
-        def close_window(e):
-            page.dialog.open = False
-            page.update()
+
 
         page.dialog = ft.AlertDialog(
             title=ft.Text(product.name, style="headlineMedium"),
@@ -102,9 +117,47 @@ def home_view(page, shopping_cart):
         )
         page.update()
 
+    def close_window(e):
+        page.dialog.open = False
+        page.update()
+
+    def open_category_dialog(e):
+        categories = list(set(get_category()))
+
+        # Crear una nueva lista de checkboxes
+        category_list = ft.Column(
+            controls=[ft.Checkbox(label=cat) for cat in categories],
+            spacing=10
+        )
+
+        # Crear un nuevo diálogo cada vez que se abra
+        category_dialog = ft.AlertDialog(
+            title=ft.Text("Seleccionar categorías"),
+            content=ft.Container(
+                content=category_list,
+                height=400,
+                width=300,
+                padding=10
+            ),
+            actions=[
+                ft.TextButton("Aplicar", on_click=lambda e: apply_filter_category(e, category_list)),
+                ft.TextButton("Cerrar", on_click=lambda e: close_window(e))
+            ]
+        )
+
+        # Asignar el nuevo diálogo a la página y abrirlo
+        page.dialog = category_dialog
+        page.dialog.open = True
+        page.update()
+
     # Campo de búsqueda y grid
-    search_field = ft.TextField(label="Buscar productos...", on_change=apply_filter)
+    search_field = ft.TextField(label="Buscar productos...", on_change=apply_filter_name)
     update_product_grid(products)
+
+    # Campo de filtrado por categoría
+    category_button = ft.ElevatedButton("Filtrar por categoría", on_click=open_category_dialog)
+    update_product_grid(products)
+
 
     # Vista principal
     return ft.Container(
@@ -112,6 +165,7 @@ def home_view(page, shopping_cart):
             controls=[
                 ft.Text("Catálogo de productos", style="headlineLarge", color=ft.colors.BLUE_GREY_900),
                 search_field,
+                category_button,
                 product_cards
             ],
             height=page.window_width*50/100,
