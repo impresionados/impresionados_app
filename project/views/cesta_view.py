@@ -1,6 +1,7 @@
 import flet as ft
 from project.views.header import header
 from project.database.crud_entero import obtener_imagen_producto_id
+import os
 
 def cesta_view(page, shopping_cart):
     """
@@ -105,8 +106,8 @@ def cesta_view(page, shopping_cart):
                             icon=ft.icons.SHOPPING_CART,
                             color=ft.colors.WHITE,
                             bgcolor=ft.colors.GREEN_700,
-                            on_click=lambda e: page.go("/compra"),
-                        ),
+                            on_click=lambda e: page.go("/compra") if os.path.isfile(
+                                "user/user_data.json") else registrate() or page.go("/login")                        ),
                         ft.ElevatedButton(
                             "Vaciar cesta",
                             icon=ft.icons.DELETE,
@@ -121,6 +122,14 @@ def cesta_view(page, shopping_cart):
             )
 
         page.update()
+
+    def registrate():
+        page.snack_bar = ft.SnackBar(
+            content=ft.Text("Debe iniciar sesión para realizar la compra."),
+            bgcolor=ft.colors.RED_600,
+            duration=3000  # El toast desaparece después de 3 segundos
+        )
+        page.snack_bar.open = True
 
     # Función para vaciar la cesta
     def clear_cart(e):
