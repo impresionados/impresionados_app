@@ -133,7 +133,7 @@ def get_product(product_id: str = "", category_list = None, discard: bool = True
         os.makedirs(carpeta_imagenes)
 
     if product_id == "":
-        productos = Product.objects()  # Recupera todos los productos de la base de datos
+        productos = Product.objects(stock__gt=0)  # Recupera todos los productos de la base de datos
 
         for producto in productos:
             if category_list:
