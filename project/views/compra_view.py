@@ -16,8 +16,6 @@ configure({
 })
 
 # Variable con la dirección
-default_address = "Calle Falsa 123, Madrid, España"
-
 # Función para calcular el total del carrito
 def calcular_total(shopping_cart):
     return sum(product[0].price * product[1] for product in shopping_cart)
@@ -38,7 +36,7 @@ def compra_view(page, shopping_cart):
     cvv2 = ft.TextField(label="CVV", width=100)
     first_name = ft.TextField(label="Nombre", width=300)
     last_name = ft.TextField(label="Apellido", width=300)
-    address = ft.TextField(label="Dirección", value=default_address, width=300)
+    address = ft.TextField(label="Dirección", width=300)
 
     # Mostrar el precio total
     total_price = calcular_total(shopping_cart)
@@ -89,27 +87,40 @@ def compra_view(page, shopping_cart):
             )
             page.snack_bar.open = True
 
+    def show_snack_bar(message):
+        page.snack_bar = ft.SnackBar(
+            content=ft.Text(message, color=ft.colors.WHITE),
+            bgcolor=ft.colors.RED_600,
+        )
+        page.snack_bar.open = True
+        page.update()
+
     # Confirmar compra
     def confirm_purchase(e):
+        # Verificar si el carrito está vacío
         if not shopping_cart:
-            page.snack_bar = ft.SnackBar(
-                content=ft.Text("Tu cesta está vacía.", color=ft.colors.WHITE),
-                bgcolor=ft.colors.RED_600,
-            )
-            page.snack_bar.open = True
+            show_snack_bar("Tu cesta está vacía")
+
+        # Verificar si la dirección está vacía
+        elif not address.value or not address.value.strip():
+            show_snack_bar("Por favor, ponga una dirección.")
+
+
+        # Verificar si no se seleccionó un método de pago
         elif not selected_payment.value:
-            page.snack_bar = ft.SnackBar(
-                content=ft.Text("Por favor, elige un método de pago.", color=ft.colors.WHITE),
-                bgcolor=ft.colors.ORANGE_600,
-            )
-            page.snack_bar.open = True
+            show_snack_bar("Por favor, elige un método de pago.")
+
+        # Validar campos de tarjeta de crédito
         elif selected_payment.value in ["Visa", "MasterCard"]:
-            if all([card_number.value, expire_month.value, expire_year.value, cvv2.value, first_name.value, last_name.value]):
+            if all([card_number.value, expire_month.value, expire_year.value, cvv2.value, first_name.value,
+                    last_name.value]):
                 page.snack_bar = ft.SnackBar(
                     content=ft.Text("¡Compra realizada con éxito! 🎉", color=ft.colors.WHITE),
                     bgcolor=ft.colors.GREEN_600,
                 )
                 page.snack_bar.open = True
+                page.update()
+
                 restar_stock(page, shopping_cart)
                 shopping_cart.clear()
                 page.go("/")
@@ -119,6 +130,9 @@ def compra_view(page, shopping_cart):
                     bgcolor=ft.colors.RED_600,
                 )
                 page.snack_bar.open = True
+                page.update()
+
+        # Procesar pago con PayPal
         elif selected_payment.value == "PayPal":
             process_paypal_payment(total_price)
 
