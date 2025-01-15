@@ -14,7 +14,12 @@ def home_view(page, shopping_cart):
     products = [i for i in items]  # Lista de productos obtenidos
 
     # Crear una lista reactiva para los productos
-    product_cards = ft.GridView(runs_count=3, spacing=20, run_spacing=20, max_extent=390, expand=1)
+    product_cards = ft.GridView(
+        spacing=10,  # Espaciado entre productos
+        run_spacing=15,  # Espaciado entre filas
+        max_extent=450,  # Ancho máximo de cada producto (ajusta según diseño)
+        expand=True,  # Expandir dinámicamente
+    )
 
     # Actualizar la vista del grid con los productos filtrados
     def update_product_grid(product_list):
@@ -31,12 +36,11 @@ def home_view(page, shopping_cart):
                             ft.Container(
                                 content=ft.Image(
                                     src=obtener_imagen_producto_id(product.id),
-                                    fit=ft.ImageFit.CONTAIN
+                                    fit=ft.ImageFit.CONTAIN,
                                 ),
-                                expand=True,
-                                alignment=ft.alignment.top_center,
-                                height=page.window_height * 0.25,  # Ajusstar imágen
-                            ),
+                                height=page.window_height * 0.25,  # Imagen ocupa 20% de la altura de la ventana
+                                alignment=ft.alignment.center,
+                                expand=True),
                             ft.Container(
                                 content=ft.Column(
                                     controls=[
@@ -79,7 +83,6 @@ def home_view(page, shopping_cart):
                                                         bgcolor=ft.colors.BLUE_GREY_100,
                                                         color=ft.colors.BLUE_GREY_800,
                                                         shape=ft.RoundedRectangleBorder(radius=6),
-                                                        # padding=ft.EdgeInsets.symmetric(horizontal=10, vertical=6),
                                                         overlay_color=ft.colors.BLUE_GREY_200,
                                                     ),
                                                     on_click=open_product_details,
@@ -100,13 +103,13 @@ def home_view(page, shopping_cart):
                             )
 
                         ],
-                        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                        spacing=15
+                        spacing=10,
+                        horizontal_alignment=ft.CrossAxisAlignment.START,
                     ),
-                    padding=15,
-                    alignment=ft.alignment.center,
+                    padding=10,
+                    bgcolor=ft.colors.WHITE,
                     border_radius=10,
-                    bgcolor=ft.colors.WHITE
+                    alignment=ft.alignment.center,
                 ),
                 elevation=10,
                 margin=10
@@ -117,6 +120,7 @@ def home_view(page, shopping_cart):
     def apply_filter_name(e):
         filter_text = search_field.value.lower()
         filtered_products = [p for p in items if filter_text in p.name.lower() or filter_text in p.category]
+        apply_filter_name(filtered_products)
         update_product_grid(filtered_products)
 
     # Función para aplicar el filtro por categorías seleccionadas
@@ -296,11 +300,49 @@ def home_view(page, shopping_cart):
         page.update()
 
     # Campo de búsqueda y grid
-    search_field = ft.TextField(label="Buscar productos...", on_change=apply_filter_name)
-    update_product_grid(products)
+    search_field = ft.TextField(
+        label="Buscar productos...",
+        on_change=apply_filter_name,
+        height=50,  # Altura del campo
+        text_style=ft.TextStyle(
+            size=16,  # Tamaño del texto
+            color=ft.colors.BLUE_GREY_800,  # Color inicial del texto
+        ),
+        border_color=ft.colors.BLUE_GREY_200,  # Borde suave
+        border_radius=8,  # Esquinas redondeadas
+        bgcolor=ft.colors.LIGHT_BLUE_50,  # Fondo suave
+    )
+
+    # update_product_grid(products)
 
     # Campo de filtrado por categoría
-    category_button = ft.ElevatedButton("Filtrar por categoría", on_click=open_category_dialog)
+    category_button = ft.ElevatedButton(
+        text="Filtrar por categoría",
+        icon=ft.icons.FILTER_LIST,  # Icono de filtro
+        style=ft.ButtonStyle(
+            bgcolor=ft.colors.LIGHT_BLUE_50,  # Fondo suave
+            color=ft.colors.BLUE_700,  # Texto e icono azul
+            shape=ft.RoundedRectangleBorder(radius=8),  # Esquinas redondeadas
+            overlay_color=ft.colors.LIGHT_BLUE_100,  # Color al hacer clic
+            elevation={"pressed": 2, "default": 4},  # Elevación dinámica
+        ),
+        height=50,  # Altura igual al campo de texto
+        on_click=open_category_dialog,
+    )
+
+    def apply_filter_name(e):
+        filter_text = search_field.value.lower()
+        filtered_products = [p for p in items if filter_text in p.name.lower() or filter_text in p.category]
+
+        # Cambiar el color del texto dinámicamente según los resultados
+        if filtered_products:
+            search_field.text_style.color = ft.colors.GREEN_600  # Texto verde si hay resultados
+        else:
+            search_field.text_style.color = ft.colors.RED_600  # Texto rojo si no hay resultados
+
+        search_field.update()  # Actualizar el campo de texto
+        update_product_grid(filtered_products)
+
     update_product_grid(products)
 
     # Vista principal
@@ -308,14 +350,20 @@ def home_view(page, shopping_cart):
         content=ft.Column(
             controls=[
                 ft.Text("Catálogo de productos", style="headlineLarge", color=ft.colors.BLUE_GREY_900),
-                search_field,
-                category_button,
-                product_cards
+                ft.Row(
+                    controls=[
+                        search_field,  # Campo de búsqueda a la izquierda
+                        category_button,  # Botón a la derecha
+                    ],
+                    alignment=ft.MainAxisAlignment.SPACE_BETWEEN,  # Coloca los elementos en los extremos
+                    spacing=0,  # Sin espacio adicional entre los controles
+                ),
+
+                product_cards,
             ],
-            height=page.window_width * 72 / 100,
             spacing=20,
-            expand=True,
-            scroll=ft.ScrollMode.ALWAYS
         ),
+        expand=True,
+        # scroll=ft.ScrollMode.ALWAYS,  # Habilita el scroll
         padding=20,
     )
