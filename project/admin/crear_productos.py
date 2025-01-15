@@ -2,7 +2,7 @@ import flet as ft
 import project.database.conection
 from project.models.mapeo_colecciones import Product, Category
 import os, shutil
-from project.database.crud_entero import create_product, add_category, delete_category_by_name, get_category_name
+from project.database.crud_entero import create_product, add_category, delete_category_by_name, get_category
 import mongoengine
 
 # Función para agregar un producto
@@ -23,7 +23,7 @@ def upload_image(file_picker_result):
 # Función para cargar categorías desde la base de datos
 def load_categories():
     try:
-        categories = [get_category_name(cat) for cat in Category.objects()]
+        categories = [get_category(cat) for cat in Category.objects()]
         return categories
     except Exception as e:
         return []
