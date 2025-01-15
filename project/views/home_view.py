@@ -312,7 +312,7 @@ def home_view(page, shopping_cart):
                 category_button,
                 product_cards
             ],
-            height=page.window_width * 50 / 100,
+            height=page.window_width * 72 / 100,
             spacing=20,
             expand=True,
             scroll=ft.ScrollMode.ALWAYS

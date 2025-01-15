@@ -19,7 +19,7 @@ def user_view(page):
     # Crear los campos para mostrar los datos
     user_field = ft.TextField(
         label="Usuario",
-        value=user_data.get("user_name"),
+        value=user_data.get("usuario"),
         read_only=True,
         prefix_icon=ft.icons.PERSON,
     )

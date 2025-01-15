@@ -199,25 +199,95 @@ def cesta_view(page, shopping_cart):
 
         # Crear el diálogo
         dialog = ft.AlertDialog(
-            title=ft.Text(product.name, style="headlineMedium"),
-            content=ft.Column(
-                controls=[
-                    ft.Image(src=obtener_imagen_producto_id(product.id), width=300, height=300),
-                    ft.Text(f"Descripción: {product.description}", style="bodyLarge"),
-                    ft.Text(f"Precio: {product.price}€", style="bodyLarge"),
-                    ft.Row(
-                        controls=[
-                            ft.ElevatedButton("-", on_click=decrement_quantity),
-                            quantity_display,
-                            ft.ElevatedButton("+", on_click=increment_quantity),
-                        ],
-                        alignment=ft.MainAxisAlignment.CENTER,
-                        spacing=20,
-                    ),
-                    ft.ElevatedButton("Cerrar", on_click=lambda e: close_dialog()),
-                ],
-                spacing=10,
+            title=ft.Text(
+                product.name,
+                style="headlineMedium",
+                color=ft.colors.BLUE_GREY_900,
+                weight=ft.FontWeight.BOLD
             ),
+            content=ft.Container(
+                content=ft.Column(
+                    controls=[
+                        ft.Container(
+                            content=ft.Image(
+                                src=obtener_imagen_producto_id(product.id),
+                                fit=ft.ImageFit.CONTAIN
+                            ),
+                            width=300,
+                            height=250,
+                            alignment=ft.alignment.center,
+                            border_radius=ft.border_radius.all(12),
+                            bgcolor=ft.colors.BLUE_GREY_50,
+                            padding=10
+                        ),
+                        ft.Text(
+                            "Descripción:",
+                            style="titleMedium",
+                            color=ft.colors.BLUE_GREY_800,
+                            weight=ft.FontWeight.BOLD
+                        ),
+                        ft.Text(
+                            product.description,
+                            style="bodyMedium",
+                            color=ft.colors.GREY_700
+                        ),
+                        ft.Text(
+                            f"Precio: {product.price}€",
+                            style="titleLarge",
+                            color=ft.colors.GREEN_700,
+                            weight=ft.FontWeight.BOLD
+                        ),
+                        ft.Divider(height=20, thickness=1, color=ft.colors.BLUE_GREY_100),
+                        ft.Row(
+                            controls=[
+                                ft.ElevatedButton(
+                                    text=" ",
+                                    icon=ft.icons.REMOVE,
+                                    on_click=decrement_quantity,
+                                    style=ft.ButtonStyle(
+                                        bgcolor=ft.colors.RED_400,
+                                        color=ft.colors.WHITE,
+                                        shape=ft.RoundedRectangleBorder(radius=10),
+                                    ),
+                                ),
+                                quantity_display,
+                                ft.ElevatedButton(
+                                    text=" ",
+                                    icon=ft.icons.ADD,
+                                    on_click=increment_quantity,
+                                    style=ft.ButtonStyle(
+                                        bgcolor=ft.colors.GREEN_400,
+                                        color=ft.colors.WHITE,
+                                        shape=ft.RoundedRectangleBorder(radius=10),
+                                    ),
+                                ),
+                            ],
+                            alignment=ft.MainAxisAlignment.CENTER,
+                            spacing=20
+                        ),
+                        ft.Container(
+                            content=ft.ElevatedButton(
+                                text="Cerrar",
+                                icon=ft.icons.CLOSE,
+                                style=ft.ButtonStyle(
+                                    bgcolor=ft.colors.BLUE_GREY_200,
+                                    color=ft.colors.BLUE_GREY_900,
+                                    shape=ft.RoundedRectangleBorder(radius=8),
+                                ),
+                                on_click=lambda e: close_dialog()
+                            ),
+                            alignment=ft.alignment.center
+                        )
+                    ],
+                    spacing=15,
+                    alignment=ft.MainAxisAlignment.CENTER
+                ),
+                padding=20,
+                border_radius=ft.border_radius.all(12),
+                bgcolor=ft.colors.WHITE,
+            ),
+            actions_alignment=ft.MainAxisAlignment.END,
+            open=True
         )
 
         # Mostrar el diálogo usando page.show_dialog()
