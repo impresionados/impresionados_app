@@ -217,23 +217,82 @@ def home_view(page, shopping_cart):
         update_product_grid(products)
 
     # Abrir detalles del producto
-    def open_product_details(e):
+    def open_product_details(e ):
         product = e.control.data
+        is_in_cart = any(p[0] == product for p in shopping_cart)  # Verificar si el producto está en la cesta
+        button_color_add_cart = ft.colors.GREEN_600 if is_in_cart else ft.colors.RED_600  # Color dinámico
 
         page.dialog = ft.AlertDialog(
-            title=ft.Text(product.name, style="headlineMedium"),
-            content=ft.Column(
-                controls=[
-                    ft.Image(src=obtener_imagen_producto_id(product.id), width=300, height=300),
-                    ft.Text(f"Descripción: {product.description}", style="bodyLarge"),
-                    ft.Text(f"Precio: {product.price}€", style="bodyLarge"),
-                    ft.ElevatedButton("Añadir a la cesta", on_click=add_to_cart, data=product),
-                    ft.ElevatedButton("Cerrar", on_click=close_window)
-                ],
-                spacing=10
+            title=ft.Text(product.name, style="headlineMedium", color=ft.colors.BLUE_GREY_900),
+            content=ft.Container(
+                content=ft.Column(
+                    controls=[
+                        ft.Container(
+                            content=ft.Image(
+                                src=obtener_imagen_producto_id(product.id),
+                                fit=ft.ImageFit.CONTAIN
+                            ),
+                            width=300,
+                            height=300,
+                            alignment=ft.alignment.center,
+                            border_radius=ft.border_radius.all(10),
+                            bgcolor=ft.colors.BLUE_GREY_50
+                        ),
+                        ft.Text(
+                            "Descripción",
+                            style="titleMedium",
+                            color=ft.colors.BLUE_GREY_800,
+                            weight=ft.FontWeight.BOLD
+                        ),
+                        ft.Text(
+                            product.description,
+                            style="bodyMedium",
+                            color=ft.colors.GREY_700
+                        ),
+                        ft.Text(
+                            f"Precio: {product.price}€",
+                            style="titleLarge",
+                            color=ft.colors.GREEN_700,
+                            weight=ft.FontWeight.BOLD
+                        ),
+                        ft.Row(
+                            controls=[
+                                ft.ElevatedButton(
+                                    text="Añadir a la cesta" if not is_in_cart else "En la cesta",
+                                    icon=ft.icons.ADD_SHOPPING_CART,
+                                    style=ft.ButtonStyle(
+                                        bgcolor=button_color_add_cart, ##################
+                                        color=ft.colors.WHITE,
+                                        shape=ft.RoundedRectangleBorder(radius=8)
+                                    ),
+                                    on_click=add_to_cart,
+                                    data=product
+                                ),
+                                ft.TextButton(
+                                    text="Cerrar",
+                                    icon=ft.icons.CLOSE,
+                                    style=ft.ButtonStyle(
+                                        color=ft.colors.RED_600,
+                                        overlay_color=ft.colors.RED_100
+                                    ),
+                                    on_click=close_window
+                                )
+                            ],
+                            alignment=ft.MainAxisAlignment.END,
+                            spacing=10
+                        )
+                    ],
+                    spacing=15,
+                    alignment=ft.MainAxisAlignment.CENTER
+                ),
+                padding=20,
+                border_radius=ft.border_radius.all(12),
+                bgcolor=ft.colors.WHITE,
             ),
+            actions_alignment=ft.MainAxisAlignment.END,
             open=True
         )
+
         page.update()
 
     # Campo de búsqueda y grid
