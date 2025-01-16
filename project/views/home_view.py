@@ -156,7 +156,7 @@ def home_view(page, shopping_cart):
         categories = list(set(get_category()))
 
         # Crear una nueva lista de checkboxes con las categorías seleccionadas previamente
-        category_list = ft.Column(
+        category_list = ft.ListView(
             controls=[
                 ft.Checkbox(
                     label=cat,
@@ -165,7 +165,8 @@ def home_view(page, shopping_cart):
                 )
                 for cat in categories
             ],
-            spacing=10
+            spacing=10,
+            height=page.window_height * 0.85,  # Establece el 85% de la altura de la ventana principal
         )
 
         # Crear el diálogo
@@ -232,24 +233,39 @@ def home_view(page, shopping_cart):
                 content=ft.Column(
                     controls=[
                         ft.Container(
-                            content=ft.Image(
-                                src=obtener_imagen_producto_id(product.id),
-                                fit=ft.ImageFit.CONTAIN
+                            content=ft.Container(
+                                content=ft.Image(
+                                    src=obtener_imagen_producto_id(product.id),
+                                    fit=ft.ImageFit.CONTAIN
+                                ),
+                                alignment=ft.alignment.center,
+                                width=300,
+
+                                height=page.window_height * 0.35,  # Tamaño dinámico para la altura
+                                border_radius=ft.border_radius.all(10),
                             ),
-                            width=300,
-                            height=300,
-                            alignment=ft.alignment.center,
-                            border_radius=ft.border_radius.all(10),
-                            bgcolor=ft.colors.BLUE_GREY_50
+                            alignment=ft.alignment.center,  # Centrar la imagen
                         ),
                         ft.Text(
                             "Descripción",
+                            style="titleMedium",
+                            color=ft.colors.BLUE_GREY_800
+                        ),
+                        ft.Text(
+                            product.description,
+                            style="bodyMedium",
+                            max_lines=None,
+                            color=ft.colors.GREY_700,
+                            # overflow=ft.TextOverflow.WRAP
+                        ),
+                        ft.Text(
+                            "Categorías",
                             style="titleMedium",
                             color=ft.colors.BLUE_GREY_800,
                             weight=ft.FontWeight.BOLD
                         ),
                         ft.Text(
-                            product.description,
+                            ", ".join(product.category),
                             style="bodyMedium",
                             color=ft.colors.GREY_700
                         ),
@@ -265,7 +281,7 @@ def home_view(page, shopping_cart):
                                     text="Añadir a la cesta" if not is_in_cart else "En la cesta",
                                     icon=ft.icons.ADD_SHOPPING_CART,
                                     style=ft.ButtonStyle(
-                                        bgcolor=button_color_add_cart, ##################
+                                        bgcolor=button_color_add_cart,
                                         color=ft.colors.WHITE,
                                         shape=ft.RoundedRectangleBorder(radius=8)
                                     ),
@@ -282,18 +298,20 @@ def home_view(page, shopping_cart):
                                     on_click=close_window
                                 )
                             ],
-                            alignment=ft.MainAxisAlignment.END,
+                            alignment=ft.MainAxisAlignment.CENTER,
                             spacing=10
                         )
                     ],
                     spacing=15,
-                    alignment=ft.MainAxisAlignment.CENTER
+                    alignment=ft.MainAxisAlignment.CENTER,
+                    scroll=ft.ScrollMode.ALWAYS  # Habilitar el scroll para el contenido
                 ),
                 padding=20,
+                width=page.window_width * 0.40,
                 border_radius=ft.border_radius.all(12),
                 bgcolor=ft.colors.WHITE,
             ),
-            actions_alignment=ft.MainAxisAlignment.END,
+            actions_alignment=ft.MainAxisAlignment.CENTER,
             open=True
         )
 
@@ -329,6 +347,8 @@ def home_view(page, shopping_cart):
         height=50,  # Altura igual al campo de texto
         on_click=open_category_dialog,
     )
+
+
 
     def apply_filter_name(e):
         filter_text = search_field.value.lower()

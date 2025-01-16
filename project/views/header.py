@@ -38,7 +38,7 @@ def header(page, shopping_cart):
             # Sección izquierda
             ft.Row(
                 controls=[
-                    ft.Icon(ft.icons.STORE, size=30, color=ft.colors.BLUE_GREY),
+                    ft.Image(src="https://i.postimg.cc/QxtvMJLm/sinfondoo.png", width=30, height=30),
                     ft.Text(
                         "Tienda 3D",
                         size=28,

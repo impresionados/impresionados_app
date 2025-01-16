@@ -133,7 +133,7 @@ def get_product(product_id: str = "", category_list = None, discard: bool = True
         os.makedirs(carpeta_imagenes)
 
     if product_id == "":
-        productos = Product.objects(stock__gt=0)  # Recupera todos los productos de la base de datos
+        productos = Product.objects()  # Recupera todos los productos de la base de datos
 
         for producto in productos:
             if category_list:
@@ -156,7 +156,7 @@ def get_id_by_product(product):
     return product.id if product else None
 
 
-def update_product(product: Product, image_path: str = None) -> Product:
+def update_product(product: Product, image_path: str = None, **kwargs) -> Product:
     """
     Actualiza los campos de un producto existente y, si se proporciona una imagen, la sube a la base de datos.
 
@@ -167,6 +167,7 @@ def update_product(product: Product, image_path: str = None) -> Product:
     if image_path:
         with open(image_path, "rb") as img_rb:
             product.image.replace(img_rb)  # Reemplaza la imagen en la base de datos
+    product.update(**kwargs)
     product.save()  # Guarda los cambios en la base de datos
     return product
 
