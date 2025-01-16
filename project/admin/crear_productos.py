@@ -183,9 +183,68 @@ def main(page):
     submit_button = ft.ElevatedButton("Add Product", on_click=submit_product)
 
 
-
     # Listado de productos
     products_list = ft.Column()
+    products_list.controls = [
+        ft.Container(
+            content=ft.Column(
+                controls=[
+                    ft.Text(
+                        product.name,
+                        weight=ft.FontWeight.BOLD,
+                        size=16,
+                        color=ft.Colors.BLUE_GREY_900,
+                        text_align=ft.TextAlign.CENTER
+                    ),
+                    ft.Text(
+                        f"Precio: {product.price}€",
+                        style="bodyMedium",
+                        color=ft.Colors.GREEN_700,
+                        weight=ft.FontWeight.BOLD,
+                        text_align=ft.TextAlign.CENTER
+                    ),
+                    ft.Text(
+                        f"Stock: {product.stock}",
+                        style="bodySmall",
+                        color=ft.Colors.BLUE_GREY_600,
+                        text_align=ft.TextAlign.CENTER
+                    ),
+                    ft.IconButton(
+                        icon=ft.Icons.EDIT,
+                        icon_size=20,
+                        tooltip="Editar producto",
+                        icon_color=ft.Colors.BLUE_ACCENT,
+                        on_click=lambda e, p=product: edit_product_dialog(p),
+                    ),
+                ],
+                alignment=ft.MainAxisAlignment.CENTER,
+                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                spacing=8,
+            ),
+            width=100,  # Ancho dinámico
+            height=100,  # Alto dinámico
+            padding=10,
+            margin=10,
+            alignment=ft.alignment.center,
+            border_radius=12,
+            bgcolor=ft.Colors.BLUE_GREY_50,
+
+        )
+        for product in load_products()
+    ]
+    page.update()
+
+    # Configura un listener para detectar el cambio de tamaño de ventana
+    def on_resized(e):
+        # Actualiza las dimensiones de las tarjetas al cambiar el tamaño de la ventana
+        width = 100
+        height = 100
+        for control in products_list.controls:
+            control.width = width
+            control.height = height
+        page.update()
+
+    page.on_resized = on_resized  # Vincula el evento de redimensionamiento
 
     def update_products_list():
         products = load_products()
@@ -193,7 +252,7 @@ def main(page):
             ft.Row([
                 ft.Text(f"{product.name}"),
                 ft.IconButton(
-                    icon=ft.icons.EDIT,
+                    icon=ft.Icons.EDIT,
                     on_click=lambda e, product=product: edit_product_dialog(product),
                 )
             ])
@@ -246,13 +305,13 @@ def main(page):
         ft.Container(
             content=ft.Column(
                 controls=[
-                    ft.Text("Gestión de Productos", style="headlineLarge", weight="bold", color=ft.colors.BLUE_700),
+                    ft.Text("Gestión de Productos", style="headlineLarge", weight="bold", color=ft.Colors.BLUE_700),
                     ft.Divider(),  # Línea divisoria para separar secciones
                     ft.Row(
                         controls=[
                             ft.Column(
                                 controls=[
-                                    ft.Text("Información del Producto", style="titleMedium", color=ft.colors.BLUE_600),
+                                    ft.Text("Información del Producto", style="titleMedium", color=ft.Colors.BLUE_600),
                                     name_input,
                                     description_input,
                                     price_input,
@@ -263,7 +322,7 @@ def main(page):
                             ),
                             ft.Column(
                                 controls=[
-                                    ft.Text("Categorías y Archivo", style="titleMedium", color=ft.colors.BLUE_600),
+                                    ft.Text("Categorías y Archivo", style="titleMedium", color=ft.Colors.BLUE_600),
                                     category_dropdown_button,
                                     selected_text,
                                     confirm_button,
@@ -279,16 +338,23 @@ def main(page):
                     submit_button,
                     load_products_button,
                     ft.Divider(),  # Línea divisoria para la sección de productos
-                    ft.Text("Lista de Productos", style="titleMedium", color=ft.colors.BLUE_700),
+                    ft.Text("Lista de Productos", style="titleMedium", color=ft.Colors.BLUE_700),
                     ft.Container(
-                        content=ft.Column(
-                            controls=[products_list],
-                            scroll=ft.ScrollMode.AUTO  # Scroll habilitado para la lista de productos
+                        content=ft.GridView(
+                            controls=products_list.controls,  # Usar la lista de productos como controles
+                            runs_count=3,  # Tres productos por fila
+                            spacing=10,  # Espaciado horizontal entre los productos
+                            run_spacing=10,  # Espaciado vertical entre las filas
+                            max_extent=300,  # Ancho máximo por tarjeta de producto
                         ),
-                        expand=True,
-                        height=300,  # Define una altura fija con scroll si es necesario
+                        expand=True,  # Permite que el contenedor crezca según el espacio disponible
+                        height=800,  # Altura mayor del contenedor
+                        padding=10,  # Añadir un poco de padding para mayor estética
+                        alignment=ft.alignment.top_center,
+                        # Alinear el contenido en la parte superior y centrado=ft.ScrollMode.AUTO,  # Scroll habilitado si excede la altura
                     ),
-                    ft.Text("Agregar Categoría", style="titleMedium", color=ft.colors.BLUE_700),
+
+                    ft.Text("Agregar Categoría", style="titleMedium", color=ft.Colors.BLUE_700),
                     ft.Row(
                         controls=[
                             category_name_input,

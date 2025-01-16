@@ -45,6 +45,8 @@ def splash_screen(page: ft.Page):
 
 def main(page: ft.Page):
     page.title = "Tienda 3D"
+    # page.window_full_screen = True
+
     page.theme_mode = ft.ThemeMode.LIGHT
 
     # Llamar a la pantalla de splash antes de cargar la app principal
@@ -73,5 +75,4 @@ def main(page: ft.Page):
 
     page.on_route_change = on_route_change
     page.go("/")
-
 ft.app(target=main)
