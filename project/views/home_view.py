@@ -310,7 +310,7 @@ def home_view(page, shopping_cart):
         ),
         border_color=ft.colors.BLUE_GREY_200,  # Borde suave
         border_radius=8,  # Esquinas redondeadas
-        bgcolor=ft.colors.LIGHT_BLUE_50,  # Fondo suave
+        bgcolor=ft.colors.BLUE_GREY_100,
     )
 
     # update_product_grid(products)
@@ -320,10 +320,10 @@ def home_view(page, shopping_cart):
         text="Filtrar por categoría",
         icon=ft.icons.FILTER_LIST,  # Icono de filtro
         style=ft.ButtonStyle(
-            bgcolor=ft.colors.LIGHT_BLUE_50,  # Fondo suave
-            color=ft.colors.BLUE_700,  # Texto e icono azul
+            bgcolor=ft.colors.BLUE_GREY_100,
+            color=ft.colors.BLUE_GREY_800,  # Color inicial del texto
             shape=ft.RoundedRectangleBorder(radius=8),  # Esquinas redondeadas
-            overlay_color=ft.colors.LIGHT_BLUE_100,  # Color al hacer clic
+            overlay_color=ft.colors.BLUE_GREY_200,
             elevation={"pressed": 2, "default": 4},  # Elevación dinámica
         ),
         height=50,  # Altura igual al campo de texto
