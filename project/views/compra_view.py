@@ -25,6 +25,7 @@ def compra_view(page, shopping_cart):
     payment_methods = ["Visa", "MasterCard", "PayPal"]
     selected_payment = ft.Dropdown(
         label="Selecciona un método de pago",
+        value="PayPal",
         options=[ft.dropdown.Option(text=method) for method in payment_methods],
         width=300
     )
@@ -148,38 +149,72 @@ def compra_view(page, shopping_cart):
     # Función para actualizar la vista según el método de pago seleccionado
     def update_payment_fields(e):
         page.controls.clear()
-        fields = [
+
+        # Agregar el header en la parte superior
+        page.add(
             header(page, shopping_cart),
-            ft.Card(
-                content=ft.Container(
-                    content=ft.Column([
-                        ft.Text("Zona de Compra", style="headlineMedium", color=ft.colors.BLUE_GREY_900),
-                        price_text,
-                        address,
-                        selected_payment,
-                        ft.Divider(),
-                    ], spacing=20, alignment=ft.MainAxisAlignment.CENTER),
-                    padding=20,
-                    border_radius=12,
-                    bgcolor=ft.colors.WHITE,
-                    alignment=ft.alignment.center,
+            ft.Container(
+                content=ft.Card(
+                    content=ft.Container(
+                        content=ft.Column(
+                            controls=[
+                                # Título en la parte superior
+                                ft.Container(
+                                    content=ft.Text(
+                                        "Zona de Compra",
+                                        style="headlineMedium",
+                                        color=ft.colors.BLUE_GREY_900,
+                                        weight="bold"
+                                    ),
+                                    alignment=ft.alignment.top_center,
+                                ),
+                                # Contenido principal dentro de una lista scrollable
+                                ft.ListView(
+                                    controls=[
+                                        price_text,
+                                        address,
+                                        selected_payment,
+                                        ft.Divider(height=1, thickness=1, color=ft.colors.BLUE_GREY_100),
+                                        # Campos adicionales si es tarjeta
+                                        *(
+                                            [
+                                                card_number,
+                                                ft.Row([expire_month, expire_year, cvv2], spacing=10),
+                                                first_name,
+                                                last_name
+                                            ] if selected_payment.value in ["Visa", "MasterCard"] else []
+                                        ),
+                                        # Botón de finalizar compra
+                                        ft.ElevatedButton(
+                                            "Finalizar Compra",
+                                            icon=ft.icons.CHECK,
+                                            bgcolor=ft.colors.GREEN_600,
+                                            color=ft.colors.WHITE,
+                                            on_click=confirm_purchase
+                                        )
+                                    ],
+                                    spacing=20,
+                                    expand=True,  # Permite que el contenido ocupe el espacio restante
+                                )
+                            ],
+                            spacing=20,
+                            alignment=ft.MainAxisAlignment.START,  # Título arriba
+                        ),
+                        padding=20,
+                        border_radius=12,
+                        bgcolor=ft.colors.WHITE,
+                        height=page.window_height * 0.75,  # Tarjeta ocupa el 75% del alto disponible
+                        width=page.window_width * 0.45,  # Tarjeta ocupa el 45% del ancho disponible
+                    ),
+                    elevation=10,
                 ),
-                elevation=10,
+                alignment=ft.alignment.center,  # Centrar la tarjeta en la pantalla
+                expand=True,  # Expandir para centrar verticalmente
             )
-        ]
+        )
 
-        if selected_payment.value in ["Visa", "MasterCard"]:
-            fields[1].content.content.controls.extend([
-                card_number,
-                ft.Row([expire_month, expire_year, cvv2], spacing=10),
-                first_name,
-                last_name
-            ])
-
-        fields[1].content.content.controls.append(ft.ElevatedButton("Finalizar Compra", on_click=confirm_purchase))
-        page.controls.extend(fields)
+        # Actualizar la página
         page.update()
-
     # Detectar cambios en el método de pago seleccionado
     selected_payment.on_change = update_payment_fields
 
