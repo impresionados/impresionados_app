@@ -1,7 +1,7 @@
 .env
 .venv/*
 *.iml
-imagens/
+images/
 *.pyc
 __pycache__/.idea/
 *.xml
