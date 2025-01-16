@@ -101,52 +101,76 @@ def create_product(name: str, description: str, price: float,
     return product
 
 
-def get_product(product_id: str = "") -> Product | mongoengine.QuerySet:
+def save_product_image(product, folder_path: str):
+    """
+    Guarda la imagen del producto localmente en una carpeta específica.
+
+    :param product: Objeto Product
+    :param folder_path: Ruta de la carpeta donde se guardará la imagen
+    """
+    try:
+        if product.image:  # Verifica si el producto tiene una imagen
+            image_path = os.path.join(folder_path, f"{product.id}.jpg")
+            with open(image_path, "wb") as img_file:
+                img_file.write(product.image.read())
+    except Exception as e:
+        print(f"Error al guardar la imagen del producto {product.id}: {e}")
+
+
+def get_product(product_id: str = "", category_list = None, discard: bool = True) -> Product | mongoengine.QuerySet:
     """
     Obtiene un producto por su ID o todos los productos de la base de datos.
 
     :param product_id: ID del producto
+    :param category_list: Lista de categorías a filtrar
+    :param discard: Si es True, filtra por categorías; si es False, las descarta
     :return: El objeto Product encontrado o None si no existe
     """
-    carpeta_imagenes = '../imagens'
+    carpeta_imagenes = '../images'
+
+    # Crear carpeta 'imagenes' si no existe
+    if not os.path.exists(carpeta_imagenes):
+        os.makedirs(carpeta_imagenes)
+
     if product_id == "":
         productos = Product.objects()  # Recupera todos los productos de la base de datos
 
-        # Crear carpeta 'imagenes' si no existe
-
-        if not os.path.exists(carpeta_imagenes):
-            os.makedirs(carpeta_imagenes)
-
-        # Guardar imágenes localmente con el nombre basado en el _id
         for producto in productos:
-            if producto.image:  # Verifica si el producto tiene una imagen
-                with open(f"{carpeta_imagenes}/{producto.id}.jpg", "wb") as img_file:
-                    img_file.write(producto.image.read())  # Guarda la imagen con el nombre del ID
+            if category_list:
+                if discard:
+                    if not set(producto.category) & set(category_list):
+                        continue
+                else:
+                    if set(producto.category) & set(category_list):
+                        continue
 
+            save_product_image(producto, carpeta_imagenes)
         return productos
     else:
         producto = Product.objects(id=product_id).first()
-        if producto.image:  # Verifica si el producto tiene una imagen
-            with open(f"{carpeta_imagenes}/{producto.id}.jpg", "wb") as img_file:
-                img_file.write(producto.image.read())  # Guarda la imagen con el nombre del ID
+        if producto:
+            save_product_image(producto, carpeta_imagenes)
         return producto
+
 def get_id_by_product(product):
     return product.id if product else None
 
 
-def update_product(product_id: str, **kwargs) -> Product:
+def update_product(product: Product, image_path: str = None, **kwargs) -> Product:
     """
-    Actualiza los campos de un producto existente.
+    Actualiza los campos de un producto existente y, si se proporciona una imagen, la sube a la base de datos.
 
-    :param product_id: ID del producto a actualizar
-    :param kwargs: Campos a actualizar
+    :param product: Objeto Product a actualizar
+    :param image_path: Ruta del archivo de imagen a actualizar
     :return: El objeto Product actualizado o None si no existe
     """
-    product = Product.objects(_id=product_id).first()
-    if product:
-        product.update(**kwargs)
-        return Product.objects(_id=product_id).first()
-    return None
+    if image_path:
+        with open(image_path, "rb") as img_rb:
+            product.image.replace(img_rb)  # Reemplaza la imagen en la base de datos
+    product.update(**kwargs)
+    product.save()  # Guarda los cambios en la base de datos
+    return product
+
 
 
 def delete_product(product_id: str) -> bool:
@@ -334,10 +358,61 @@ def obtener_imagen_producto_id(producto_id):
         producto_id (int): El ID del producto cuya imagen se quiere abrir.
     """
     try:
-        ruta_imagen = f"../imagens/{producto_id}.jpg"
+        ruta_imagen = f"../images/{producto_id}.jpg"
         if os.path.exists(ruta_imagen):
             return ruta_imagen
         else:
             print(f"No se encontró la imagen para el producto con ID {producto_id}.")
     except Exception as e:
         print(f"Error al abrir la imagen: {e}")
+
+
+#
+# CRUD FUNCTION FROM CATEGORY
+#
+
+def add_category(name: str) -> Category:
+    """
+    Añade una nueva categoría a la base de datos.
+    :param name: Nombre de la categoría.
+    :return: Objeto Category creado.
+    """
+    # Verificar si la categoría ya existe
+    existing_category = Category.objects(name=name).first()
+    if existing_category:
+        raise ValueError(f"La categoría '{name}' ya existe.")
+
+    # Crear y guardar la nueva categoría
+    new_category = Category(name=name)
+    new_category.save()
+    return new_category
+
+def delete_category_by_name(name: str) -> bool:
+    """
+    Elimina una categoría de la base de datos por su nombre.
+    :param name: Nombre de la categoría a eliminar.
+    :return: True si la categoría fue eliminada, False si no se encontró.
+    """
+    category_to_delete = Category.objects(name=name).first()
+    if not category_to_delete:
+        return False
+
+    category_to_delete.delete()
+    return True
+
+def get_category(category: Category = "") -> str|list[str]:
+    """
+    Devuelve el nombre de un objeto Category.
+    :param category: Objeto Category.
+    :return: Nombre de la categoría.
+
+    """
+    if not category:
+        categories = Category.objects()
+        categories = [category.name for category in categories]
+    elif not isinstance(category, Category):
+        raise TypeError("El objeto proporcionado no es una instancia de Category.")
+    else:
+        categories = category.name
+    return categories
+print(get_category())
