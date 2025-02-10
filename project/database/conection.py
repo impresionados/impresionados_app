@@ -16,7 +16,7 @@ def conection():
         # Establece la conexión
         conection = mongoengine.connect(
             db="impresionados_app",
-            host=f"mongodb+srv://impresionados:656UJjLTTcrEQNuQ@prueba.2hwb4.mongodb.net/?retryWrites=true&w=majority&appName=prueba"
+            host=f"mongodb+srv://impresionados:*******@prueba.2hwb4.mongodb.net/?retryWrites=true&w=majority&appName=prueba"
         )
         print("Conexión establecida con la base de datos.")
         return conection
