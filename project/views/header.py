@@ -23,7 +23,7 @@ def header(page, shopping_cart):
 
     # Botón de perfil
     user_button = ft.ElevatedButton(
-        text="Perfil",
+        text="Perfil" if os.path.isfile("user/user_data.json") else "Iniciar sesión",
         icon=ft.icons.PERSON,
         on_click=lambda e: page.go("/login") if not os.path.isfile('user/user_data.json') else page.go("/user_data"),
         style=ft.ButtonStyle(
